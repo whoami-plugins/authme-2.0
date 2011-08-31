@@ -1,7 +1,7 @@
 package uk.org.whoami.authme.datasource;
 
-import java.util.HashMap;
 import java.util.List;
+import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
 public class FileDataSource implements DataSource {
 
@@ -11,7 +11,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean createAuth(String user, String password) {
+    public boolean saveAuth(PlayerAuth auth) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -21,12 +21,22 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public HashMap<String, String> getAuth(String user) {
+    public PlayerAuth getAuth(String user) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public List<HashMap<String, String>> getAllRegisteredUsers() {
+    public List<PlayerAuth> getAllRegisteredUsers() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean updateIP(PlayerAuth auth) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean updatePassword(PlayerAuth auth) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

@@ -17,8 +17,15 @@ public class Messages extends Configuration {
     }
     
     private void loadDefaults() {
+        map.put("Already logged in!", "Already logged in!");
+        map.put("Not logged in!", "Not logged in!");
         map.put("Registration is disabled","Registration is disabled");
+        map.put("Username already registered", "Username already registered");
         map.put("Usage: /register password", "Usage: /register password");
+        map.put("Usage: /login password", "Usage: /login password");
+        map.put("Username not registered", "Username not registered");
+        map.put("Password changed", "Password changed");
+        map.put("Wrong old password", "Wrong old password");
     }
 
     private void loadFile() {

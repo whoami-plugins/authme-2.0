@@ -1,6 +1,7 @@
 package uk.org.whoami.authme.settings;
 
 import org.bukkit.util.config.Configuration;
+import uk.org.whoami.authme.security.PasswordSecurity;
 
 public class Settings {
     
@@ -8,7 +9,7 @@ public class Settings {
     public static final String CACHE_FOLDER = Settings.PLUGIN_FOLDER + "/cache";
     public static final String AUTH_FILE = Settings.PLUGIN_FOLDER + "/auths.db";
     public static final String MESSAGE_FILE = Settings.PLUGIN_FOLDER + "/messages.yml";
-
+    
     private Configuration conf;
     
     public Settings(Configuration conf) {
@@ -34,19 +35,49 @@ public class Settings {
     }
     
     public boolean isRegistrationEnabled() {
-        String key = "Settings.registration";
+        String key = "Settings.registrationEnabled";
         if(conf.getString(key) == null) {
             conf.setProperty(key, true);
         }
         return conf.getBoolean(key, true);
     }
     
-    public String getPasswordHash() {
+    public boolean isChatAllowed() {
+        String key = "Settings.enableChat";
+        if(conf.getString(key) == null) {
+            conf.setProperty(key, false);
+        }
+        return conf.getBoolean(key, false);
+    }
+    
+    public boolean isMovementAllowed() {
+        String key = "Settings.enableMove";
+        if(conf.getString(key) == null) {
+            conf.setProperty(key, false);
+        }
+        return conf.getBoolean(key, false);
+    }
+    
+    public boolean isKickNonRegisteredEnabled() {
+        String key = "Settings.kickNonRegistered";
+        if(conf.getString(key) == null) {
+            conf.setProperty(key, false);
+        }
+        return conf.getBoolean(key, false);
+    }
+    
+    public int getPasswordHash() {
         String key = "Settings.passwordHash";
         if(conf.getString(key) == null) {
             conf.setProperty(key, "SHA256");
         }
-        return conf.getString(key);
+        
+        String entry = conf.getString(key);
+        if(entry.equals("MD5")) return PasswordSecurity.MD5;
+        if(entry.equals("SHA1")) return PasswordSecurity.SHA1;
+        if(entry.equals("SHA256")) return PasswordSecurity.SHA256;
+        
+        return 0;
     }
     
     public boolean isCachingEnabled() {

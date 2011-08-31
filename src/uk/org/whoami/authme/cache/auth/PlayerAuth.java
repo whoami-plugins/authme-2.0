@@ -3,10 +3,12 @@ package uk.org.whoami.authme.cache.auth;
 public class PlayerAuth {
 
     private String nickname;
+    private String hash;
     private String ip;
 
-    public PlayerAuth(String nickname, String ip) {
+    public PlayerAuth(String nickname, String hash, String ip) {
         this.nickname = nickname;
+        this.hash = hash;
         this.ip = ip;
     }
 
@@ -18,6 +20,10 @@ public class PlayerAuth {
         return nickname;
     }
 
+    public String getHash() {
+        return hash;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof PlayerAuth)) return false;
