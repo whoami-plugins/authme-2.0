@@ -1,0 +1,29 @@
+name: AuthMe
+author: whoami
+description: AuthMe prevents people, which aren't logged in, from doing stuff like placing blocks, moving, typing commands or seeing the inventory of the current player.
+main: uk.org.whoami.authme.AuthMe
+version: 2.0
+commands:
+    register:
+        description: Register an account
+        usage: /register password
+    login:
+        description: Login into a account
+        usage: /login password
+    changepassword:
+        description: Change password of a account
+        usage: /changepassword oldPassword newPassword
+permissions:
+    authme.*:
+        description: Gives access to all authme commands
+        children:
+            authme.register: true
+    authme.register:
+        description: Register an account
+        default: true
+    authme.login:
+        description: Login into a account
+        default: true
+    authme.changepassword:
+        description: Change password of a account
+        default: true

@@ -30,7 +30,7 @@ public class AuthMe extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.settings = new Settings(this.getConfiguration());
+        this.settings = Settings.getInstance();
         if (settings.getDataSource().equals("file")) {
             database = new FileDataSource();
         }
@@ -43,7 +43,7 @@ public class AuthMe extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
         }
 
-        AuthMePlayerListener playerListener = new AuthMePlayerListener(settings);
+        AuthMePlayerListener playerListener = new AuthMePlayerListener(this,database);
         AuthMeBlockListener blockListener = new AuthMeBlockListener();
         AuthMeEntityListener entityListener = new AuthMeEntityListener();
 

@@ -26,6 +26,11 @@ public class Messages extends Configuration {
         map.put("Username not registered", "Username not registered");
         map.put("Password changed", "Password changed");
         map.put("Wrong old password", "Wrong old password");
+        map.put("Registered players only! Please visit http://example.com to register","Registered players only! Please visit http://example.com to register");
+        map.put("Valid session detected: AutoLogin", "Valid session detected: AutoLogin");
+        map.put("Please login with \"/login password\"", "Please login with \"/login password\"");
+        map.put("Please register with \"/register password\"", "Please register with \"/register password\"");
+        map.put("Login Timeout", "Login Timeout");
     }
 
     private void loadFile() {

@@ -4,7 +4,7 @@ import java.util.List;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
 public interface DataSource {
-    
+            
     public boolean isAuthAvailable(String user);
     public PlayerAuth getAuth(String user);
     
