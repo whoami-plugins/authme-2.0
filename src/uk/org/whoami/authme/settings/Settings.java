@@ -23,6 +23,13 @@ public class Settings extends Configuration{
     private void write() {
         isRegistrationEnabled();
         isForcedRegistrationEnabled();
+        isSessionsEnabled();
+        getRegistrationTimeout();
+        isChatAllowed();
+        isMovementAllowed();
+        getMovementRadius();
+        isKickNonRegisteredEnabled();
+        getPasswordHash();
         getDataSource();
         isCachingEnabled();
         save();
@@ -85,7 +92,7 @@ public class Settings extends Configuration{
     }
     
     public boolean isKickNonRegisteredEnabled() {
-        String key = "Settings.kickNonRegistered";
+        String key = "Registration.kickNonRegistered";
         if(getString(key) == null) {
             setProperty(key, false);
         }

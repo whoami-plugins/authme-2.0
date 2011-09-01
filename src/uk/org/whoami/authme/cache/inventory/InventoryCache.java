@@ -20,7 +20,7 @@ public class InventoryCache {
         cache.put(player.getName().toLowerCase(), new Inventory(inv,arm));
     }
     
-    public void deleteInvemtory(String name) {
+    public void deleteInventory(String name) {
         cache.remove(name);
     }
         

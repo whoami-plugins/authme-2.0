@@ -46,7 +46,11 @@ public class Messages extends Configuration {
     }
     
     public String _(String msg) {
-        return map.get(msg);
+        String loc = map.get(msg);
+        if(loc != null) {
+            return loc;
+        }
+        return msg;
     }
     
     public static Messages getInstance() {

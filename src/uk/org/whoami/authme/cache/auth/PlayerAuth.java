@@ -23,7 +23,15 @@ public class PlayerAuth {
     public String getHash() {
         return hash;
     }
-    
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+        
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof PlayerAuth)) return false;
@@ -37,9 +45,9 @@ public class PlayerAuth {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 71 * hash + (this.nickname != null ? this.nickname.hashCode() : 0);
-        hash = 71 * hash + (this.ip != null ? this.ip.hashCode() : 0);
-        return hash;
+        int hashCode = 7;
+        hashCode = 71 * hashCode + (this.nickname != null ? this.nickname.hashCode() : 0);
+        hashCode = 71 * hashCode + (this.ip != null ? this.ip.hashCode() : 0);
+        return hashCode;
     }
 }

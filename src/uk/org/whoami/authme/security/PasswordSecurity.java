@@ -16,7 +16,7 @@ public class PasswordSecurity {
     private int hash;
 
     public PasswordSecurity(int hash) throws NoSuchAlgorithmException {
-        if (hash > MD5 || hash < SHA256) {
+        if (hash < MD5 || hash > SHA256) {
             throw new NoSuchAlgorithmException("Unknown hash");
         }
 

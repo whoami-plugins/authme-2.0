@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.settings.Settings;
@@ -48,7 +48,6 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-
         return false;
     }
 
@@ -73,7 +72,6 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-
         return true;
     }
 
@@ -82,22 +80,23 @@ public class FileDataSource implements DataSource {
         if (!isAuthAvailable(auth.getNickname())) {
             return false;
         }
-        
+
         PlayerAuth newAuth = null;
 
         BufferedReader br = null;
-        BufferedWriter bw = null;
         try {
             br = new BufferedReader(new FileReader(source));
             String line = "";
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
                 if (args[0].equals(auth.getNickname())) {
-                    newAuth = new PlayerAuth(args[0],args[1],auth.getIp());
+                    newAuth = new PlayerAuth(args[0], args[1], auth.getIp());
                     break;
                 }
-            }            
+            }
         } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
         } catch (IOException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;
@@ -109,7 +108,44 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-        
+        removeAuth(auth.getNickname());
+        saveAuth(newAuth);
+        return true;
+    }
+
+    @Override
+    public boolean updatePassword(PlayerAuth auth) {
+        if (!isAuthAvailable(auth.getNickname())) {
+            return false;
+        }
+
+        PlayerAuth newAuth = null;
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args[0].equals(auth.getNickname())) {
+                    newAuth = new PlayerAuth(args[0], auth.getHash(), args[2]);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
         removeAuth(auth.getNickname());
         saveAuth(newAuth);
         return true;
@@ -188,13 +224,12 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-
         return null;
     }
 
     @Override
-    public List<PlayerAuth> getAllRegisteredUsers() {
-        ArrayList<PlayerAuth> authList = new ArrayList<PlayerAuth>();
+    public HashMap<String, PlayerAuth> getAllRegisteredUsers() {
+        HashMap<String,PlayerAuth> map = new HashMap<String,PlayerAuth>();
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(source));
@@ -202,17 +237,17 @@ public class FileDataSource implements DataSource {
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
                 if (args.length == 2) {
-                    authList.add(new PlayerAuth(args[0], args[1], "198.18.0.1"));
+                    map.put(args[0], new PlayerAuth(args[0], args[1], "198.18.0.1"));
                 } else if (args.length == 3) {
-                    authList.add(new PlayerAuth(args[0], args[1], args[2]));
+                    map.put(args[0], new PlayerAuth(args[0], args[1], args[2]));
                 }
             }
         } catch (FileNotFoundException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return authList;
+            return map;
         } catch (IOException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return authList;
+            return map;
         } finally {
             if (br != null) {
                 try {
@@ -221,12 +256,6 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-
-        return authList;
-    }
-
-    @Override
-    public boolean updatePassword(PlayerAuth auth) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return map;
     }
 }

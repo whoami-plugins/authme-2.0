@@ -26,6 +26,6 @@ public class ConsoleLogger {
     }
 
     public static void showError(String message) {
-        log.severe("[AuthMe] " + message);
+        log.severe("[AuthMe] ERROR: " + message);
     }
 }

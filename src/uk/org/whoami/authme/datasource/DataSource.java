@@ -1,17 +1,17 @@
 package uk.org.whoami.authme.datasource;
 
-import java.util.List;
+import java.util.HashMap;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
 public interface DataSource {
             
-    public boolean isAuthAvailable(String user);
-    public PlayerAuth getAuth(String user);
+    boolean isAuthAvailable(String user);
+    PlayerAuth getAuth(String user);
     
-    public boolean saveAuth(PlayerAuth auth);
-    public boolean updateIP(PlayerAuth auth);
-    public boolean updatePassword(PlayerAuth auth);
-    public boolean removeAuth(String user);
+    boolean saveAuth(PlayerAuth auth);
+    boolean updateIP(PlayerAuth auth);
+    boolean updatePassword(PlayerAuth auth);
+    boolean removeAuth(String user);
     
-    List<PlayerAuth> getAllRegisteredUsers();
+    HashMap<String,PlayerAuth> getAllRegisteredUsers();
 }

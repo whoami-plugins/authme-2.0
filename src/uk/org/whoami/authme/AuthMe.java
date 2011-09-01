@@ -2,8 +2,6 @@ package uk.org.whoami.authme;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,6 +13,7 @@ import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.cache.inventory.Inventory;
 import uk.org.whoami.authme.cache.inventory.InventoryCache;
+import uk.org.whoami.authme.datasource.CacheDataSource;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.FileDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
@@ -40,8 +39,14 @@ public class AuthMe extends JavaPlugin {
             } catch (IOException ex) {
                 ConsoleLogger.showError("Can't load database");
                 this.getServer().getPluginManager().disablePlugin(this);
+                return;
             }
         }
+        
+        if(settings.isCachingEnabled()) {
+            database = new CacheDataSource(database);
+        }
+        
         m = Messages.getInstance();
 
         try {
@@ -49,10 +54,11 @@ public class AuthMe extends JavaPlugin {
         } catch (NoSuchAlgorithmException ex) {
             ConsoleLogger.showError(ex.getMessage());
             this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this,database);
-        AuthMeBlockListener blockListener = new AuthMeBlockListener();
+        AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
         AuthMeEntityListener entityListener = new AuthMeEntityListener();
 
         PluginManager pm = getServer().getPluginManager();
@@ -87,7 +93,6 @@ public class AuthMe extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -128,7 +133,7 @@ public class AuthMe extends JavaPlugin {
             if (inv != null) {
                 player.getInventory().setContents(inv.getInventory());
                 player.getInventory().setArmorContents(inv.getArmour());
-                InventoryCache.getInstance().deleteInvemtory(name);
+                InventoryCache.getInstance().deleteInventory(name);
             }
 
             return true;
@@ -159,10 +164,9 @@ public class AuthMe extends JavaPlugin {
                 if (inv != null) {
                     player.getInventory().setContents(inv.getInventory());
                     player.getInventory().setArmorContents(inv.getArmour());
-                    InventoryCache.getInstance().deleteInvemtory(name);
+                    InventoryCache.getInstance().deleteInventory(name);
                 }
             }
-
         }
 
         if (label.equalsIgnoreCase("changepassword")) {
