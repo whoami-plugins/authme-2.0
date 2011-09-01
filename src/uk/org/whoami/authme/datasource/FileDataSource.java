@@ -1,43 +1,232 @@
 package uk.org.whoami.authme.datasource;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
+import uk.org.whoami.authme.settings.Settings;
 
 public class FileDataSource implements DataSource {
 
+    private File source;
+
+    public FileDataSource() throws IOException {
+        source = new File(Settings.AUTH_FILE);
+        source.createNewFile();
+    }
+
     @Override
     public boolean isAuthAvailable(String user) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length > 1 && args[0].equals(user)) {
+                    return true;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
     public boolean saveAuth(PlayerAuth auth) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+        if (isAuthAvailable(auth.getNickname())) {
+            return false;
+        }
 
-    @Override
-    public boolean removeAuth(String user) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(source, true));
+            bw.write(auth.getNickname() + ":" + auth.getHash() + ":" + auth.getIp() + "\n");
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
 
-    @Override
-    public PlayerAuth getAuth(String user) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public List<PlayerAuth> getAllRegisteredUsers() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return true;
     }
 
     @Override
     public boolean updateIP(PlayerAuth auth) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (!isAuthAvailable(auth.getNickname())) {
+            return false;
+        }
+        
+        PlayerAuth newAuth = null;
+
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args[0].equals(auth.getNickname())) {
+                    newAuth = new PlayerAuth(args[0],args[1],auth.getIp());
+                    break;
+                }
+            }            
+        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+        
+        removeAuth(auth.getNickname());
+        saveAuth(newAuth);
+        return true;
+    }
+
+    @Override
+    public boolean removeAuth(String user) {
+        if (!isAuthAvailable(user)) {
+            return false;
+        }
+
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        ArrayList<String> lines = new ArrayList<String>();
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length > 1 && args[0].equals(user)) {
+                    lines.add(line);
+                }
+            }
+            bw = new BufferedWriter(new FileWriter(source));
+            for (String l : lines) {
+                bw.write(l + "\n");
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public PlayerAuth getAuth(String user) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length == 2) {
+                    return new PlayerAuth(args[0], args[1], "198.18.0.1");
+                } else if (args.length == 3) {
+                    return new PlayerAuth(args[0], args[1], args[2]);
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return null;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return null;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<PlayerAuth> getAllRegisteredUsers() {
+        ArrayList<PlayerAuth> authList = new ArrayList<PlayerAuth>();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length == 2) {
+                    authList.add(new PlayerAuth(args[0], args[1], "198.18.0.1"));
+                } else if (args.length == 3) {
+                    authList.add(new PlayerAuth(args[0], args[1], args[2]));
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return authList;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return authList;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+
+        return authList;
     }
 
     @Override
     public boolean updatePassword(PlayerAuth auth) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
 }

@@ -1,6 +1,9 @@
 package uk.org.whoami.authme;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,7 +35,12 @@ public class AuthMe extends JavaPlugin {
     public void onEnable() {
         this.settings = Settings.getInstance();
         if (settings.getDataSource().equals("file")) {
-            database = new FileDataSource();
+            try {
+                database = new FileDataSource();
+            } catch (IOException ex) {
+                ConsoleLogger.showError("Can't load database");
+                this.getServer().getPluginManager().disablePlugin(this);
+            }
         }
         m = Messages.getInstance();
 
