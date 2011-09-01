@@ -2,6 +2,7 @@ package uk.org.whoami.authme;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import uk.org.whoami.authme.cache.inventory.InventoryCache;
 import uk.org.whoami.authme.datasource.CacheDataSource;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.FileDataSource;
+import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
@@ -37,16 +39,32 @@ public class AuthMe extends JavaPlugin {
             try {
                 database = new FileDataSource();
             } catch (IOException ex) {
-                ConsoleLogger.showError("Can't load database");
+                ConsoleLogger.showError(ex.getMessage());
                 this.getServer().getPluginManager().disablePlugin(this);
                 return;
             }
+        } else if (settings.getDataSource().equals("mysql")) {
+            try {
+                database = new MySQLDataSource();
+            } catch (ClassNotFoundException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                this.getServer().getPluginManager().disablePlugin(this);
+                return;
+            } catch (SQLException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                this.getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+        } else {
+            ConsoleLogger.showError("Unknown database type");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
-        
-        if(settings.isCachingEnabled()) {
+
+        if (settings.isCachingEnabled()) {
             database = new CacheDataSource(database);
         }
-        
+
         m = Messages.getInstance();
 
         try {
@@ -57,7 +75,7 @@ public class AuthMe extends JavaPlugin {
             return;
         }
 
-        AuthMePlayerListener playerListener = new AuthMePlayerListener(this,database);
+        AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
         AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
         AuthMeEntityListener entityListener = new AuthMeEntityListener();
 
@@ -88,11 +106,12 @@ public class AuthMe extends JavaPlugin {
                 Priority.Lowest, this);
         pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener,
                 Priority.Lowest, this);
-        ConsoleLogger.info("Authme loaded");
+        ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
     @Override
     public void onDisable() {
+        database.close();
     }
 
     @Override
@@ -135,7 +154,6 @@ public class AuthMe extends JavaPlugin {
                 player.getInventory().setArmorContents(inv.getArmour());
                 InventoryCache.getInstance().deleteInventory(name);
             }
-
             return true;
         }
 
@@ -167,6 +185,7 @@ public class AuthMe extends JavaPlugin {
                     InventoryCache.getInstance().deleteInventory(name);
                 }
             }
+            return true;
         }
 
         if (label.equalsIgnoreCase("changepassword")) {
@@ -190,6 +209,7 @@ public class AuthMe extends JavaPlugin {
             } else {
                 player.sendMessage("Wrong old password");
             }
+            return true;
         }
         return false;
     }

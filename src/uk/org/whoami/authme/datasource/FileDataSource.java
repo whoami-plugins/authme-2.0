@@ -23,7 +23,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean isAuthAvailable(String user) {
+    public synchronized boolean isAuthAvailable(String user) {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(source));
@@ -52,7 +52,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean saveAuth(PlayerAuth auth) {
+    public synchronized boolean saveAuth(PlayerAuth auth) {
         if (isAuthAvailable(auth.getNickname())) {
             return false;
         }
@@ -76,7 +76,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean updateIP(PlayerAuth auth) {
+    public synchronized boolean updateIP(PlayerAuth auth) {
         if (!isAuthAvailable(auth.getNickname())) {
             return false;
         }
@@ -114,7 +114,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean updatePassword(PlayerAuth auth) {
+    public synchronized boolean updatePassword(PlayerAuth auth) {
         if (!isAuthAvailable(auth.getNickname())) {
             return false;
         }
@@ -152,7 +152,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean removeAuth(String user) {
+    public synchronized boolean removeAuth(String user) {
         if (!isAuthAvailable(user)) {
             return false;
         }
@@ -197,7 +197,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public PlayerAuth getAuth(String user) {
+    public synchronized PlayerAuth getAuth(String user) {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(source));
@@ -228,7 +228,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public HashMap<String, PlayerAuth> getAllRegisteredUsers() {
+    public synchronized HashMap<String, PlayerAuth> getAllRegisteredUsers() {
         HashMap<String,PlayerAuth> map = new HashMap<String,PlayerAuth>();
         BufferedReader br = null;
         try {
@@ -258,4 +258,7 @@ public class FileDataSource implements DataSource {
         }
         return map;
     }
+
+    @Override
+    public synchronized void close() {}
 }

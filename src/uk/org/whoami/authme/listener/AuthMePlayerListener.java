@@ -86,7 +86,6 @@ public class AuthMePlayerListener extends PlayerListener {
             player.sendMessage(m._("Please register with \"/register password\""));
         }
 
-        event.setMessage("/notloggedin");
         event.setCancelled(true);
     }
 

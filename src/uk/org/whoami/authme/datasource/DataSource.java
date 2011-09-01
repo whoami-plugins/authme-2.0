@@ -13,5 +13,7 @@ public interface DataSource {
     boolean updatePassword(PlayerAuth auth);
     boolean removeAuth(String user);
     
+    void close();
+    
     HashMap<String,PlayerAuth> getAllRegisteredUsers();
 }

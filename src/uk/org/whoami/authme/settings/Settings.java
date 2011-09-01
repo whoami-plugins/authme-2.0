@@ -32,6 +32,13 @@ public class Settings extends Configuration{
         getPasswordHash();
         getDataSource();
         isCachingEnabled();
+        getMySQLHost();
+        getMySQLPort();
+        getMySQLUsername();
+        getMySQLPassword();
+        getMySQLTablename();
+        getMySQLColumnName();
+        getMySQLColumnPassword();
         save();
     }
     
@@ -125,6 +132,70 @@ public class Settings extends Configuration{
         String key = "DataSource.backend";
         if(getString(key) == null) {
             setProperty(key, "file");
+        }
+        return getString(key);
+    }
+    
+    public String getMySQLHost() {
+        String key = "DataSource.mySQLHost";
+        if(getString(key) == null) {
+            setProperty(key, "127.0.0.1");
+        }
+        return getString(key);
+    }
+    
+    public String getMySQLPort() {
+        String key = "DataSource.mySQLPort";
+        if(getString(key) == null) {
+            setProperty(key, "3306");
+        }
+        return getString(key);
+    }
+    
+    public String getMySQLUsername() {
+        String key = "DataSource.mySQLUsername";
+        if(getString(key) == null) {
+            setProperty(key, "authme");
+        }
+        return getString(key);
+    }
+
+    public String getMySQLPassword() {
+        String key = "DataSource.mySQLPassword";
+        if(getString(key) == null) {
+            setProperty(key, "12345");
+        }
+        return getString(key);
+    }
+    
+    public String getMySQLDatabase() {
+        String key = "DataSource.mySQLDatabase";
+        if(getString(key) == null) {
+            setProperty(key, "authme");
+        }
+        return getString(key);
+    }
+        
+    public String getMySQLTablename() {
+        String key = "DataSource.mySQLTablename";
+        if(getString(key) == null) {
+            setProperty(key, "authme");
+        }
+        return getString(key);
+    }
+
+    public String getMySQLColumnName() {
+        String key = "DataSource.mySQLColumnName";
+        if(getString(key) == null) {
+            setProperty(key, "username");
+        }
+        return getString(key);
+    }
+
+    public String getMySQLColumnPassword() {
+        String key = "DataSource.mySQLColumnPassword";
+        if(getString(key) == null) {
+            setProperty(key, "password");
         }
         return getString(key);
     }

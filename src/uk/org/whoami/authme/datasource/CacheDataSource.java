@@ -14,17 +14,17 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean isAuthAvailable(String user) {
+    public synchronized boolean isAuthAvailable(String user) {
         return cache.containsKey(user);
     }
 
     @Override
-    public PlayerAuth getAuth(String user) {
+    public synchronized PlayerAuth getAuth(String user) {
         return cache.get(user);
     }
 
     @Override
-    public boolean saveAuth(PlayerAuth auth) {
+    public synchronized boolean saveAuth(PlayerAuth auth) {
         if(source.saveAuth(auth)) {
             cache.put(auth.getNickname(), auth);
         }
@@ -32,7 +32,7 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean updateIP(PlayerAuth auth) {
+    public synchronized boolean updateIP(PlayerAuth auth) {
         if(source.updateIP(auth)) {
             cache.get(auth.getNickname()).setIp(auth.getIp());
             return true;
@@ -41,7 +41,7 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean updatePassword(PlayerAuth auth) {
+    public synchronized boolean updatePassword(PlayerAuth auth) {
         if(source.updateIP(auth)) {
             cache.get(auth.getNickname()).setHash(auth.getHash());
             return true;
@@ -50,7 +50,7 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean removeAuth(String user) {
+    public synchronized boolean removeAuth(String user) {
         if(source.removeAuth(user)) {
             cache.remove(user);
             return true;
@@ -59,8 +59,13 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public HashMap<String,PlayerAuth> getAllRegisteredUsers() {
+    public synchronized HashMap<String,PlayerAuth> getAllRegisteredUsers() {
         return cache;
+    }
+
+    @Override
+    public synchronized void close() {
+        source.close();
     }
     
 }
