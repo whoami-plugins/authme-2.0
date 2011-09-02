@@ -38,6 +38,7 @@ public class Messages extends Configuration {
         map.put("login", "&cSuccessful login!");
         map.put("no_perm","&cNo Permission");
         map.put("same_nick", "Same nick is already playing");
+        map.put("reg_voluntarily", "You can register your nickname with the server with the command \"/register password\"");
     }
 
     private void loadFile() {

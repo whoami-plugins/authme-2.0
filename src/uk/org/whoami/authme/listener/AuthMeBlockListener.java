@@ -6,12 +6,12 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource;
-import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.Settings;
 
 public class AuthMeBlockListener extends BlockListener {
     
     private DataSource data;
-    private Messages m = Messages.getInstance();
+    private Settings settings = Settings.getInstance();    
 
     public AuthMeBlockListener(DataSource data) {
         this.data = data;
@@ -24,16 +24,18 @@ public class AuthMeBlockListener extends BlockListener {
         }
         
         Player player = event.getPlayer();
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
         
-        if(data.isAuthAvailable(player.getName().toLowerCase())) {
-            player.sendMessage(m._("Please login with \"/login password\""));
-        } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
+        if(data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
         }
-        
+               
         event.setCancelled(true);
     }
     
@@ -44,16 +46,18 @@ public class AuthMeBlockListener extends BlockListener {
         }
         
         Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
         
-        if(data.isAuthAvailable(player.getName().toLowerCase())) {
-            player.sendMessage(m._("Please login with \"/login password\""));
-        } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
+        if(data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
         }
-        
+                
         event.setCancelled(true);
     }
 }

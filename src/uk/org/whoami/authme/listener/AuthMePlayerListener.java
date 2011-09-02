@@ -44,14 +44,17 @@ public class AuthMePlayerListener extends PlayerListener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
 
-        if (!settings.isForcedRegistrationEnabled()) {
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
 
-        Player player = event.getPlayer();
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
-            return;
+        if (!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
         }
 
         String cmd = event.getMessage().split(" ")[0];
@@ -69,25 +72,24 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
-        if (!settings.isForcedRegistrationEnabled()) {
-            return;
-        }
-
-        if (settings.isChatAllowed()) {
-            return;
-        }
-
         Player player = event.getPlayer();
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
 
-        if (data.isAuthAvailable(player.getName().toLowerCase())) {
-            player.sendMessage(m._("Please login with \"/login password\""));
+        if (data.isAuthAvailable(name)) {
+            player.sendMessage(m._("login_msg"));
         } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
+            if (settings.isChatAllowed()) {
+                return;
+            }
+            player.sendMessage(m._("reg_msg"));
         }
-
         event.setCancelled(true);
     }
 
@@ -97,19 +99,22 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
-        if (!settings.isForcedRegistrationEnabled()) {
-            return;
-        }
-
-        if (settings.isMovementAllowed()) {
-            return;
-        }
-
         Player player = event.getPlayer();
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
 
+        if (!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
+
+            if (settings.isMovementAllowed()) {
+                return;
+            }
+        }
         event.setTo(event.getFrom());
 
         //event.setCancelled(true);
@@ -120,28 +125,23 @@ public class AuthMePlayerListener extends PlayerListener {
         if (event.getResult() != Result.ALLOWED || event.getPlayer() == null) {
             return;
         }
-        
+
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
         //Remove doubles from premises
-        for(Player onlinePlayer:plugin.getServer().getOnlinePlayers()) {
-            if(onlinePlayer.getName().equals(event.getPlayer().getName())) {
-                event.disallow(Result.KICK_BANNED, m._("same_nick"));
+        for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+            if (onlinePlayer.getName().equals(player.getName())) {
+                event.disallow(Result.KICK_OTHER, m._("same_nick"));
             }
         }
 
-        if (!settings.isKickNonRegisteredEnabled()) {
-            return;
+        if (settings.isKickNonRegisteredEnabled()) {
+            if (!data.isAuthAvailable(name)) {
+                event.disallow(Result.KICK_OTHER, m._("reg_only"));
+                return;
+            }
         }
-
-        if (!settings.isForcedRegistrationEnabled()) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
-            return;
-        }
-
-        event.disallow(Result.KICK_BANNED, m._("reg_only"));
     }
 
     @Override
@@ -153,22 +153,23 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
         String ip = player.getAddress().getAddress().getHostAddress();
-        if (!settings.isForcedRegistrationEnabled() && !data.isAuthAvailable(name)) {
+
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
 
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
-            return;
-        }
-
-        if (settings.isSessionsEnabled()) {
-            if (data.isAuthAvailable(name)) {
+        if (data.isAuthAvailable(name)) {
+            if (settings.isSessionsEnabled()) {
                 PlayerAuth auth = data.getAuth(name);
                 if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
                     PlayerCache.getInstance().addPlayer(auth);
                     player.sendMessage(m._("valid_session"));
                     return;
                 }
+            }
+        } else {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
             }
         }
 
@@ -201,7 +202,7 @@ public class AuthMePlayerListener extends PlayerListener {
             plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
             LimboCache.getInstance().deleteLimboPlayer(name);
         }
-        PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
+        PlayerCache.getInstance().removePlayer(name);
     }
 
     @Override
@@ -220,7 +221,7 @@ public class AuthMePlayerListener extends PlayerListener {
             plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
             LimboCache.getInstance().deleteLimboPlayer(name);
         }
-        PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
+        PlayerCache.getInstance().removePlayer(name);
     }
 
     @Override
@@ -230,15 +231,18 @@ public class AuthMePlayerListener extends PlayerListener {
         }
 
         Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-
-        if (data.isAuthAvailable(player.getName().toLowerCase())) {
-            player.sendMessage(m._("Please login with \"/login password\""));
-        } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
+        
+        if(!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
         }
+        
         event.setCancelled(true);
     }
 
@@ -249,15 +253,18 @@ public class AuthMePlayerListener extends PlayerListener {
         }
 
         Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-
-        if (data.isAuthAvailable(player.getName().toLowerCase())) {
-            player.sendMessage(m._("Please login with \"/login password\""));
-        } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
+        
+        if(!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
         }
+        
         event.setCancelled(true);
     }
 }

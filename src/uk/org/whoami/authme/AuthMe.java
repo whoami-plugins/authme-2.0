@@ -81,7 +81,7 @@ public class AuthMe extends JavaPlugin {
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
         AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
-        AuthMeEntityListener entityListener = new AuthMeEntityListener();
+        AuthMeEntityListener entityListener = new AuthMeEntityListener(database);
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener,
