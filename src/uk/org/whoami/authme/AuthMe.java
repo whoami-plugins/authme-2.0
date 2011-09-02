@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Sebastian Köhler <sebkoehler@whoami.org.uk>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.org.whoami.authme;
 
 import java.io.IOException;
@@ -136,6 +152,7 @@ public class AuthMe extends JavaPlugin {
                 database.reload();
                 settings.reload();
                 m.reload();
+                sender.sendMessage(m._("reload"));
             } else if (args[0].equalsIgnoreCase("register")) {
                 if (args.length != 3) {
                     sender.sendMessage("Usage: /authme register playername password");
@@ -260,7 +277,9 @@ public class AuthMe extends JavaPlugin {
                 if (limbo != null) {
                     player.getInventory().setContents(limbo.getInventory());
                     player.getInventory().setArmorContents(limbo.getArmour());
-                    player.teleport(limbo.getLoc());
+                    if(settings.isTeleportToSpawnEnabled()) {
+                        player.teleport(limbo.getLoc());
+                    }
                     this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                     LimboCache.getInstance().deleteLimboPlayer(name);
                 }
@@ -314,12 +333,14 @@ public class AuthMe extends JavaPlugin {
             player.getInventory().setContents(new ItemStack[36]);
 
             int delay = settings.getRegistrationTimeout() * 20;
-            int interval = settings.getWarnMessageInterval() * 20;
+            int interval = settings.getWarnMessageInterval();
             BukkitScheduler sched = this.getServer().getScheduler();
-            int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
+            if(delay != 0) { 
+                int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
+                LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+            }
             sched.scheduleSyncDelayedTask(this, new MessageTask(this,name,m._("login_msg"),interval));
-            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
-
+   
             player.sendMessage(m._("logout"));
             ConsoleLogger.info(player.getDisplayName() + " logged out");
             return true;
@@ -345,11 +366,13 @@ public class AuthMe extends JavaPlugin {
                 database.removeAuth(name);
 
                 int delay = settings.getRegistrationTimeout() * 20;
-                int interval = settings.getWarnMessageInterval() * 20;
+                int interval = settings.getWarnMessageInterval();
                 BukkitScheduler sched = this.getServer().getScheduler();
-                int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
+                if(delay != 0) {
+                    int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
+                    LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+                }
                 sched.scheduleSyncDelayedTask(this, new MessageTask(this, name, m._("reg_msg"), interval));
-                LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
 
                 player.sendMessage("unregistered");
                 ConsoleLogger.info(player.getDisplayName() + " unregistered himself");

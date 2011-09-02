@@ -1,5 +1,22 @@
+/*
+ * Copyright 2011 Sebastian Köhler <sebkoehler@whoami.org.uk>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.org.whoami.authme.listener;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -112,12 +129,26 @@ public class AuthMePlayerListener extends PlayerListener {
             }
 
             if (settings.isMovementAllowed()) {
+                if(settings.getMovementRadius() > 0) {
+                    int radius = settings.getMovementRadius();
+                    System.out.println(radius);
+                    Location spawn = player.getWorld().getSpawnLocation();
+                    Location to = event.getTo();
+                    if(to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius) {
+                        event.setCancelled(true);
+                    }
+                    if(to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius) {
+                        event.setCancelled(true);
+                    }
+                    if(to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
+                        event.setCancelled(true);
+                    }
+                    event.setTo(to);
+                }
                 return;
             }
         }
         event.setTo(event.getFrom());
-
-        //event.setCancelled(true);
     }
 
     @Override
@@ -128,11 +159,25 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-
+        
+        int min = settings.getMinNickLength();
+        int max = settings.getMaxNickLength();
+        String regex = settings.getNickRegex();
+        
+        if(name.length() > max || name.length() < min) {
+            event.disallow(Result.KICK_OTHER, "Your nickname has the wrong length. MaxLen: " + max + ", MinLen: " + min);
+            return;
+        }
+        if(!player.getName().matches(regex) || name.equals("Player")) {
+            event.disallow(Result.KICK_OTHER, "Your nickname contains illegal characters. Allowed chars: " + regex);
+            return;
+        }
+        
         //Remove doubles from premises
         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
             if (onlinePlayer.getName().equals(player.getName())) {
                 event.disallow(Result.KICK_OTHER, m._("same_nick"));
+                return;
             }
         }
 
@@ -176,15 +221,19 @@ public class AuthMePlayerListener extends PlayerListener {
         LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
-        player.teleport(player.getWorld().getSpawnLocation());
+        if(settings.isTeleportToSpawnEnabled()) {
+            player.teleport(player.getWorld().getSpawnLocation());
+        }
 
         String msg = data.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
         int time = settings.getRegistrationTimeout() * 20;
         int msgInterval = settings.getWarnMessageInterval();
         BukkitScheduler sched = plugin.getServer().getScheduler();
-        int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
-        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
-        LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+        if(time != 0) {
+            int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
+            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+        }
+        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));  
     }
 
     @Override
