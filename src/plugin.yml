@@ -13,11 +13,31 @@ commands:
     changepassword:
         description: Change password of a account
         usage: /changepassword oldPassword newPassword
+    logout:
+        description: Logout
+        usage: /logout
+    unregister:
+        description: unregister your account
+        usage: /unregister password
+    authme:
+        description: AuthMe op commands
+        usage: '/authme reload|register playername password|changepassword playername password|unregister playername'
 permissions:
     authme.*:
         description: Gives access to all authme commands
         children:
             authme.register: true
+            authme.login: true
+            authme.changepassword: true
+            authme.logout: true
+            authme.unregister: true
+    authme.admin.*:
+         description: Gives access to all authme admin commands
+         children:
+             authme.admin.reload: true
+             authme.admin.register: true
+             authme.admin.changepassword: true
+             authme.admin.unregister: true
     authme.register:
         description: Register an account
         default: true
@@ -27,3 +47,21 @@ permissions:
     authme.changepassword:
         description: Change password of a account
         default: true
+    authme.logout:
+        description: Logout
+        default: true
+    authme.unregister:
+        description: unregister your account
+        default: true
+    authme.admin.reload:
+        description: AuthMe reload commands
+        default: op
+    authme.admin.register:
+        description: AuthMe register command
+        default: op
+    authme.admin.changepassword:
+        description: AuthMe changepassword command
+        default: op
+    authme.admin.unregister:
+        description: AuthMe unregister command
+        default: op

@@ -258,4 +258,8 @@ public class MySQLDataSource implements DataSource {
             ConsoleLogger.showError("Couldn't close MySQL connection");
         }
     }
+
+    @Override
+    public void reload() {
+    }
 }

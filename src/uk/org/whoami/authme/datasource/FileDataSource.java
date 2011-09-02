@@ -165,7 +165,7 @@ public class FileDataSource implements DataSource {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
-                if (args.length > 1 && args[0].equals(user)) {
+                if (args.length > 1 && !args[0].equals(user)) {
                     lines.add(line);
                 }
             }
@@ -261,4 +261,7 @@ public class FileDataSource implements DataSource {
 
     @Override
     public synchronized void close() {}
+
+    @Override
+    public void reload() {}
 }

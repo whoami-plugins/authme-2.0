@@ -14,13 +14,15 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
-import uk.org.whoami.authme.cache.inventory.Inventory;
-import uk.org.whoami.authme.cache.inventory.InventoryCache;
+import uk.org.whoami.authme.cache.inventory.LimboPlayer;
+import uk.org.whoami.authme.cache.inventory.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.Settings;
+import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
 public class AuthMePlayerListener extends PlayerListener {
@@ -107,15 +109,26 @@ public class AuthMePlayerListener extends PlayerListener {
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
+
         event.setTo(event.getFrom());
-                
+
         //event.setCancelled(true);
     }
 
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         if (event.getResult() != Result.ALLOWED || event.getPlayer() == null) {
+            return;
+        }
+        
+        //Remove doubles from premises
+        for(Player onlinePlayer:plugin.getServer().getOnlinePlayers()) {
+            if(onlinePlayer.getName().equals(event.getPlayer().getName())) {
+                event.disallow(Result.KICK_BANNED, m._("same_nick"));
+            }
+        }
+
+        if (!settings.isKickNonRegisteredEnabled()) {
             return;
         }
 
@@ -128,11 +141,7 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
-        if (!settings.isKickNonRegisteredEnabled()) {
-            return;
-        }
-
-        event.disallow(Result.KICK_BANNED, m._("Registered players only! Please visit http://example.com to register"));
+        event.disallow(Result.KICK_BANNED, m._("reg_only"));
     }
 
     @Override
@@ -157,24 +166,24 @@ public class AuthMePlayerListener extends PlayerListener {
                 PlayerAuth auth = data.getAuth(name);
                 if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
                     PlayerCache.getInstance().addPlayer(auth);
-                    player.sendMessage(m._("Valid session detected: AutoLogin"));
+                    player.sendMessage(m._("valid_session"));
                     return;
                 }
             }
         }
 
-        InventoryCache.getInstance().addInventory(player);
+        LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
+        player.teleport(player.getWorld().getSpawnLocation());
 
-        if (data.isAuthAvailable(name)) {
-            player.sendMessage(m._("Please login with \"/login password\""));
-        } else {
-            player.sendMessage(m._("Please register with \"/register password\""));
-        }
-
+        String msg = data.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
         int time = settings.getRegistrationTimeout() * 20;
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
+        int msgInterval = settings.getWarnMessageInterval();
+        BukkitScheduler sched = plugin.getServer().getScheduler();
+        int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
+        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+        LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
     }
 
     @Override
@@ -184,11 +193,13 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        if (InventoryCache.getInstance().hasInventory(name)) {
-            Inventory inv = InventoryCache.getInstance().getInventory(name);
-            player.getInventory().setArmorContents(inv.getArmour());
-            player.getInventory().setContents(inv.getInventory());
-            InventoryCache.getInstance().deleteInventory(name);
+        if (LimboCache.getInstance().hasLimboPlayer(name)) {
+            LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
+            player.getInventory().setArmorContents(limbo.getArmour());
+            player.getInventory().setContents(limbo.getInventory());
+            player.teleport(limbo.getLoc());
+            plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+            LimboCache.getInstance().deleteLimboPlayer(name);
         }
         PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
     }
@@ -201,11 +212,13 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        if (InventoryCache.getInstance().hasInventory(name)) {
-            Inventory inv = InventoryCache.getInstance().getInventory(name);
-            player.getInventory().setArmorContents(inv.getArmour());
-            player.getInventory().setContents(inv.getInventory());
-            InventoryCache.getInstance().deleteInventory(name);
+        if (LimboCache.getInstance().hasLimboPlayer(name)) {
+            LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
+            player.getInventory().setArmorContents(limbo.getArmour());
+            player.getInventory().setContents(limbo.getInventory());
+            player.teleport(limbo.getLoc());
+            plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+            LimboCache.getInstance().deleteLimboPlayer(name);
         }
         PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
     }

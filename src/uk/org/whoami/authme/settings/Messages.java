@@ -17,20 +17,27 @@ public class Messages extends Configuration {
     }
     
     private void loadDefaults() {
-        map.put("Already logged in!", "Already logged in!");
-        map.put("Not logged in!", "Not logged in!");
-        map.put("Registration is disabled","Registration is disabled");
-        map.put("Username already registered", "Username already registered");
-        map.put("Usage: /register password", "Usage: /register password");
-        map.put("Usage: /login password", "Usage: /login password");
-        map.put("Username not registered", "Username not registered");
-        map.put("Password changed", "Password changed");
-        map.put("Wrong old password", "Wrong old password");
-        map.put("Registered players only! Please visit http://example.com to register","Registered players only! Please visit http://example.com to register");
-        map.put("Valid session detected: AutoLogin", "Valid session detected: AutoLogin");
-        map.put("Please login with \"/login password\"", "Please login with \"/login password\"");
-        map.put("Please register with \"/register password\"", "Please register with \"/register password\"");
-        map.put("Login Timeout", "Login Timeout");
+        map.put("logged_in", "&cAlready logged in!");
+        map.put("not_logged_in", "&cNot logged in!");
+        map.put("reg_disabled","&cRegistration is disabled");
+        map.put("user_regged", "&cUsername already registered");
+        map.put("usage_reg", "&cUsage: /register password");
+        map.put("usage_log", "&cUsage: /login password");
+        map.put("user_unknown", "&cUsername not registered");
+        map.put("pwd_changed", "&cPassword changed!");
+        map.put("reg_only","Registered players only! Please visit http://example.com to register");
+        map.put("valid_session", "&cSession login");
+        map.put("login_msg", "&cPlease login with \"/login password\"");
+        map.put("reg_msg", "&cPlease register with \"/register password\"");
+        map.put("timeout", "Login Timeout");
+        map.put("wrong_pwd", "&cWrong password");
+        map.put("logout","&cSuccessful logout");
+        map.put("usage_unreg","&cUsage: /unregister password");
+        map.put("registered", "&cSuccessfully registered!");
+        map.put("unregistered","&cSuccessfully unregistered!");
+        map.put("login", "&cSuccessful login!");
+        map.put("no_perm","&cNo Permission");
+        map.put("same_nick", "Same nick is already playing");
     }
 
     private void loadFile() {
@@ -48,9 +55,13 @@ public class Messages extends Configuration {
     public String _(String msg) {
         String loc = map.get(msg);
         if(loc != null) {
-            return loc;
+            return loc.replace("&", "\u00a7");
         }
         return msg;
+    }
+    
+    public void reload() {
+        loadFile();
     }
     
     public static Messages getInstance() {

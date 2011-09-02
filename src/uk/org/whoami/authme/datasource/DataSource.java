@@ -14,6 +14,7 @@ public interface DataSource {
     boolean removeAuth(String user);
     
     void close();
+    void reload();
     
     HashMap<String,PlayerAuth> getAllRegisteredUsers();
 }

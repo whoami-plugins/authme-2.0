@@ -42,7 +42,7 @@ public class CacheDataSource implements DataSource {
 
     @Override
     public synchronized boolean updatePassword(PlayerAuth auth) {
-        if(source.updateIP(auth)) {
+        if(source.updatePassword(auth)) {
             cache.get(auth.getNickname()).setHash(auth.getHash());
             return true;
         }
@@ -66,6 +66,11 @@ public class CacheDataSource implements DataSource {
     @Override
     public synchronized void close() {
         source.close();
+    }
+
+    @Override
+    public void reload() {
+        cache = source.getAllRegisteredUsers();
     }
     
 }

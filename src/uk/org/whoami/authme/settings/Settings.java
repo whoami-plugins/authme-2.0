@@ -4,7 +4,7 @@ import java.io.File;
 import org.bukkit.util.config.Configuration;
 import uk.org.whoami.authme.security.PasswordSecurity;
 
-public class Settings extends Configuration{
+public final class Settings extends Configuration{
     
     public static final String PLUGIN_FOLDER = "./plugins/AuthMe";
     public static final String CACHE_FOLDER = Settings.PLUGIN_FOLDER + "/cache";
@@ -16,6 +16,10 @@ public class Settings extends Configuration{
     
     private Settings() {
         super(new File(Settings.PLUGIN_FOLDER + "/config.yml"));
+        reload();
+    }
+    
+    public void reload() {
         load();
         write();
     }
@@ -23,6 +27,7 @@ public class Settings extends Configuration{
     private void write() {
         isRegistrationEnabled();
         isForcedRegistrationEnabled();
+        getWarnMessageInterval();
         isSessionsEnabled();
         getRegistrationTimeout();
         isChatAllowed();
@@ -36,6 +41,7 @@ public class Settings extends Configuration{
         getMySQLPort();
         getMySQLUsername();
         getMySQLPassword();
+        getMySQLDatabase();
         getMySQLTablename();
         getMySQLColumnName();
         getMySQLColumnPassword();
@@ -43,7 +49,7 @@ public class Settings extends Configuration{
     }
     
     public boolean isForcedRegistrationEnabled() {
-        String key = "Registration.force";
+        String key = "settings.registration.force";
         if(getString(key) == null) {
             setProperty(key, true);
         }
@@ -51,15 +57,31 @@ public class Settings extends Configuration{
     }
     
     public boolean isRegistrationEnabled() {
-        String key = "Registration.enabled";
+        String key = "settings.registration.enabled";
         if(getString(key) == null) {
             setProperty(key, true);
         }
         return getBoolean(key, true);
     }
     
+    public int getWarnMessageInterval() {
+        String key = "settings.registration.messageInterval";
+        if(getString(key) == null) {
+            setProperty(key, 5);
+        }
+        return getInt(key, 5);
+    }
+    
     public boolean isSessionsEnabled() {
-        String key = "Registration.sessions";
+        String key = "settings.sessions";
+        if(getString(key) == null) {
+            setProperty(key, false);
+        }
+        return getBoolean(key, false);
+    }
+    
+    public boolean isKickOnWrongPasswordEnabled() {
+        String key = "settings.restrictions.kickOnWrongPassword";
         if(getString(key) == null) {
             setProperty(key, false);
         }
@@ -67,7 +89,7 @@ public class Settings extends Configuration{
     }
     
     public int getRegistrationTimeout() {
-        String key = "Registration.timeout";
+        String key = "settings.restrictions.timeout";
         if(getString(key) == null) {
             setProperty(key, 30);
         }
@@ -75,7 +97,7 @@ public class Settings extends Configuration{
     }
     
     public boolean isChatAllowed() {
-        String key = "Chat.allowed";
+        String key = "settings.restrictions.allowChat";
         if(getString(key) == null) {
             setProperty(key, false);
         }
@@ -83,7 +105,7 @@ public class Settings extends Configuration{
     }
     
     public boolean isMovementAllowed() {
-        String key = "Movement.allowed";
+        String key = "settings.restrictions.allowMovement";
         if(getString(key) == null) {
             setProperty(key, false);
         }
@@ -91,7 +113,7 @@ public class Settings extends Configuration{
     }
     
     public int getMovementRadius() {
-        String key = "Movement.radius";
+        String key = "settings.restrictions.allowedMovementRadius";
         if(getString(key) == null) {
             setProperty(key, 100);
         }
@@ -99,15 +121,23 @@ public class Settings extends Configuration{
     }
     
     public boolean isKickNonRegisteredEnabled() {
-        String key = "Registration.kickNonRegistered";
+        String key = "settings.restrictions.kickNonRegistered";
         if(getString(key) == null) {
             setProperty(key, false);
         }
         return getBoolean(key, false);
     }
     
+    public boolean isTeleportToSpawnEnabled() {
+        String key = "settings.restrictions.teleportUnAuthedToSpawn";
+        if(getString(key) == null) {
+            setProperty(key, true);
+        }
+        return getBoolean(key, true);
+    }
+    
     public int getPasswordHash() {
-        String key = "Settings.passwordHash";
+        String key = "settings.security.passwordHash";
         if(getString(key) == null) {
             setProperty(key, "SHA256");
         }
