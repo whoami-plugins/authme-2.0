@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -301,6 +302,28 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+        
+        if(!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
+        }
+        
+        event.setCancelled(true);
+    }
+    
+    @Override
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
         
