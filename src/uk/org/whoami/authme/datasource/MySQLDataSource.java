@@ -72,13 +72,13 @@ public class MySQLDataSource implements DataSource {
             st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
                     + "id INTEGER AUTO_INCREMENT,"
                     + columnName + " VARCHAR(20) NOT NULL,"
-                    + columnPassword + "VARCHAR(100) NOT NULL,"
+                    + columnPassword + " VARCHAR(100) NOT NULL,"
                     + "ip VARCHAR(40) NOT NULL,"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, "ip");
             if (!rs.next()) {
-                st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN"
+                st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN "
                         + "ip VARCHAR(40) NOT NULL;");
             }
         } finally {
