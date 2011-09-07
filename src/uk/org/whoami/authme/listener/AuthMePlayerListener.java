@@ -18,6 +18,7 @@ package uk.org.whoami.authme.listener;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -363,6 +364,26 @@ public class AuthMePlayerListener extends PlayerListener {
     
     @Override
     public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+        
+        if(!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
+        }       
+        event.setCancelled(true);
+    }
+    
+    @Override
+    public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
