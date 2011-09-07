@@ -139,7 +139,9 @@ public class AuthMe extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        database.close();
+        if(database != null) {
+            database.close();
+        }
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " disabled");
     }
 

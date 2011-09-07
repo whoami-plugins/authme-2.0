@@ -268,10 +268,12 @@ public class MySQLDataSource implements DataSource {
 
     @Override
     public synchronized void close() {
-        try {
-            con.close();
-        } catch (SQLException ex) {
-            ConsoleLogger.showError("Couldn't close MySQL connection");
+        if(con != null) {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                ConsoleLogger.showError("Couldn't close MySQL connection");
+            }
         }
     }
 
