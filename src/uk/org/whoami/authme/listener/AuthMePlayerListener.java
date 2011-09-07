@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -342,6 +343,26 @@ public class AuthMePlayerListener extends PlayerListener {
     
     @Override
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+        
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+        
+        if(!data.isAuthAvailable(name)) {
+            if (!settings.isForcedRegistrationEnabled()) {
+                return;
+            }
+        }       
+        event.setCancelled(true);
+    }
+    
+    @Override
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
