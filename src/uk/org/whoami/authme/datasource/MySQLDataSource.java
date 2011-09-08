@@ -130,9 +130,9 @@ public class MySQLDataSource implements DataSource {
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 if (rs.getString(3).isEmpty()) {
-                    return new PlayerAuth(rs.getString(1), rs.getString(2), "198.18.0.1");
+                    return new PlayerAuth(rs.getString(2), rs.getString(3), "198.18.0.1");
                 } else {
-                    return new PlayerAuth(rs.getString(1), rs.getString(2), rs.getString(3));
+                    return new PlayerAuth(rs.getString(2), rs.getString(3), rs.getString(4));
                 }
             } else {
                 return null;
@@ -247,9 +247,9 @@ public class MySQLDataSource implements DataSource {
             ResultSet rs = pst.executeQuery();
             while(rs.next()) {
                 if(rs.getString(3).isEmpty()) {
-                    map.put(rs.getString(1), new PlayerAuth(rs.getString(1),rs.getString(2),"198.18.0.1"));
+                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2),rs.getString(3),"198.18.0.1"));
                 } else {
-                    map.put(rs.getString(1), new PlayerAuth(rs.getString(1),rs.getString(2),rs.getString(3)));
+                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2),rs.getString(3),rs.getString(4)));
                 }
             }
         } catch (SQLException ex) {

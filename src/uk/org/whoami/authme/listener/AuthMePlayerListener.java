@@ -326,10 +326,13 @@ public class AuthMePlayerListener extends PlayerListener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
-        
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
         
+        if(settings.isTeleportToSpawnEnabled() && event.getTo().equals(player.getWorld().getSpawnLocation())) {
+            return;
+        }
+                
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }

@@ -279,6 +279,7 @@ public class AuthMe extends JavaPlugin {
             }
 
             String hash = database.getAuth(name).getHash();
+            System.out.println(hash);
             if (pws.comparePasswordWithHash(args[0], hash)) {
                 PlayerAuth auth = new PlayerAuth(name, hash, ip);
                 database.updateIP(auth);
