@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.org.whoami.authme.security;
 
 import java.math.BigInteger;
@@ -23,28 +22,25 @@ import uk.org.whoami.authme.ConsoleLogger;
 
 public class PasswordSecurity {
 
-    public static final int MD5 = 1;
-    public static final int SHA1 = 2;
-    public static final int SHA256 = 3;
+    public enum Hash {
+
+        MD5, SHA1, SHA256
+    }
+    private Hash hash;
     private MessageDigest md5;
     private MessageDigest sha256;
     private MessageDigest sha1;
-    private int hash;
 
-    public PasswordSecurity(int hash) throws NoSuchAlgorithmException {
-        if (hash < MD5 || hash > SHA256) {
-            throw new NoSuchAlgorithmException("Unknown hash");
+    public PasswordSecurity(Hash hash) throws NullPointerException, NoSuchAlgorithmException {
+        if (hash == null) {
+            throw new NullPointerException("Hash can not be null");
         }
 
         this.hash = hash;
+        this.md5 = MessageDigest.getInstance("MD5");
+        this.sha256 = MessageDigest.getInstance("SHA-256");
+        this.sha1 = MessageDigest.getInstance("SHA1");
 
-        try {
-            this.md5 = MessageDigest.getInstance("MD5");
-            this.sha256 = MessageDigest.getInstance("SHA-256");
-            this.sha1 = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-        }
     }
 
     private String getMD5(String message) {
@@ -81,29 +77,32 @@ public class PasswordSecurity {
         return "$SHA$" + salt + "$" + getSHA256(getSHA256(message) + salt);
     }
 
-    public String getHash(String password) {
-        if (hash == MD5) {
-            return getMD5(password);
-        } else if (hash == SHA1) {
-            return getSHA1(password);
-        } else {
-            String salt = Long.toHexString(Double.doubleToLongBits(Math.random()));
-            return getSaltedHash(password, salt);
+    public String getHash(String password) throws NoSuchAlgorithmException {
+        switch (hash) {
+            case MD5:
+                return getMD5(password);
+            case SHA1:
+                return getSHA1(password);
+            case SHA256:
+                String salt = Long.toHexString(Double.doubleToLongBits(Math.random()));
+                return getSaltedHash(password, salt);
+            default:
+                throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
     }
-    
+
     public boolean comparePasswordWithHash(String password, String hash) {
-        if(hash.length() == 32) {
+        if (hash.length() == 32) {
             return hash.equals(getMD5(password));
         }
-        
-        if(hash.length() == 40) {
+
+        if (hash.length() == 40) {
             return hash.equals(getSHA1(password));
         }
-        
-        if(hash.contains("$")) {
+
+        if (hash.contains("$")) {
             String[] line = hash.split("\\$");
-            if(line.length > 3 && line[1].equals("SHA")) {
+            if (line.length > 3 && line[1].equals("SHA")) {
                 return hash.equals(getSaltedHash(password, line[2]));
             } else {
                 return false;

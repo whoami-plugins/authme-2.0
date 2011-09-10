@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.org.whoami.authme;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,10 +28,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
-import uk.org.whoami.authme.cache.inventory.LimboPlayer;
 import uk.org.whoami.authme.cache.inventory.LimboCache;
+import uk.org.whoami.authme.cache.inventory.LimboPlayer;
 import uk.org.whoami.authme.datasource.CacheDataSource;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.FileDataSource;
@@ -93,6 +94,10 @@ public class AuthMe extends JavaPlugin {
             ConsoleLogger.showError(ex.getMessage());
             this.getServer().getPluginManager().disablePlugin(this);
             return;
+        } catch (NullPointerException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
@@ -139,7 +144,7 @@ public class AuthMe extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if(database != null) {
+        if (database != null) {
             database.close();
         }
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " disabled");
@@ -169,31 +174,42 @@ public class AuthMe extends JavaPlugin {
                     return true;
                 }
 
-                String name = args[1].toLowerCase();
-                String hash = pws.getHash(args[2]);
+                try {
+                    String name = args[1].toLowerCase();
+                    String hash = pws.getHash(args[2]);
 
-                if (database.isAuthAvailable(name)) {
-                    sender.sendMessage(m._("user_regged"));
-                    return true;
+
+                    if (database.isAuthAvailable(name)) {
+                        sender.sendMessage(m._("user_regged"));
+                        return true;
+                    }
+
+                    PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
+                    database.saveAuth(auth);
+                    sender.sendMessage(m._("registered"));
+                    ConsoleLogger.info(args[1] + " registered");
+                } catch (NoSuchAlgorithmException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    sender.sendMessage("Internal Error please read the server log");
                 }
-
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
-                database.saveAuth(auth);
-                sender.sendMessage(m._("registered"));
-                ConsoleLogger.info(args[1] + " registered");
             } else if (args[0].equalsIgnoreCase("changepassword")) {
                 if (args.length != 3) {
                     sender.sendMessage("Usage: /authme changepassword playername newpassword");
                     return true;
                 }
 
-                String name = args[1].toLowerCase();
-                String hash = pws.getHash(args[2]);
+                try {
+                    String name = args[1].toLowerCase();
+                    String hash = pws.getHash(args[2]);
 
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
-                database.updatePassword(auth);
-                sender.sendMessage("pwd_changed");
-                ConsoleLogger.info(args[0] + "'s password changed");
+                    PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
+                    database.updatePassword(auth);
+                    sender.sendMessage("pwd_changed");
+                    ConsoleLogger.info(args[0] + "'s password changed");
+                } catch (NoSuchAlgorithmException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    sender.sendMessage("Internal Error please read the server log");
+                }
             } else if (args[0].equalsIgnoreCase("unregister")) {
                 if (args.length != 2) {
                     sender.sendMessage("Usage: /authme unregister playername");
@@ -246,19 +262,27 @@ public class AuthMe extends JavaPlugin {
                 return true;
             }
 
-            String hash = pws.getHash(args[0]);
-            PlayerAuth auth = new PlayerAuth(name, hash, ip);
-            database.saveAuth(auth);
-            PlayerCache.getInstance().addPlayer(auth);
-            LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
-            if (limbo != null) {
-                player.getInventory().setContents(limbo.getInventory());
-                player.getInventory().setArmorContents(limbo.getArmour());
-                this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
-                LimboCache.getInstance().deleteLimboPlayer(name);
+
+
+            try {
+                String hash = pws.getHash(args[0]);
+
+                PlayerAuth auth = new PlayerAuth(name, hash, ip);
+                database.saveAuth(auth);
+                PlayerCache.getInstance().addPlayer(auth);
+                LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
+                if (limbo != null) {
+                    player.getInventory().setContents(limbo.getInventory());
+                    player.getInventory().setArmorContents(limbo.getArmour());
+                    this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+                    LimboCache.getInstance().deleteLimboPlayer(name);
+                }
+                player.sendMessage(m._("registered"));
+                ConsoleLogger.info(player.getDisplayName() + " registered");
+            } catch (NoSuchAlgorithmException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                sender.sendMessage("Internal Error please read the server log");
             }
-            player.sendMessage(m._("registered"));
-            ConsoleLogger.info(player.getDisplayName() + " registered");
             return true;
         }
 
@@ -288,7 +312,7 @@ public class AuthMe extends JavaPlugin {
                 if (limbo != null) {
                     player.getInventory().setContents(limbo.getInventory());
                     player.getInventory().setArmorContents(limbo.getArmour());
-                    if(settings.isTeleportToSpawnEnabled()) {
+                    if (settings.isTeleportToSpawnEnabled()) {
                         player.teleport(limbo.getLoc());
                     }
                     this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
@@ -318,15 +342,21 @@ public class AuthMe extends JavaPlugin {
                 return true;
             }
 
-            String hashnew = pws.getHash(args[1]);
-            if (pws.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
-                PlayerAuth auth = new PlayerAuth(name, hashnew, ip);
-                database.updatePassword(auth);
-                PlayerCache.getInstance().updatePlayer(auth);
-                player.sendMessage(m._("pwd_changed"));
-                ConsoleLogger.info(player.getDisplayName() + " changed his password");
-            } else {
-                player.sendMessage(m._("wrong_pwd"));
+            try {
+                String hashnew = pws.getHash(args[1]);
+
+                if (pws.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
+                    PlayerAuth auth = new PlayerAuth(name, hashnew, ip);
+                    database.updatePassword(auth);
+                    PlayerCache.getInstance().updatePlayer(auth);
+                    player.sendMessage(m._("pwd_changed"));
+                    ConsoleLogger.info(player.getDisplayName() + " changed his password");
+                } else {
+                    player.sendMessage(m._("wrong_pwd"));
+                }
+            } catch (NoSuchAlgorithmException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                sender.sendMessage("Internal Error please read the server log");
             }
             return true;
         }
@@ -346,12 +376,12 @@ public class AuthMe extends JavaPlugin {
             int delay = settings.getRegistrationTimeout() * 20;
             int interval = settings.getWarnMessageInterval();
             BukkitScheduler sched = this.getServer().getScheduler();
-            if(delay != 0) { 
+            if (delay != 0) {
                 int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
                 LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
             }
-            sched.scheduleSyncDelayedTask(this, new MessageTask(this,name,m._("login_msg"),interval));
-   
+            sched.scheduleSyncDelayedTask(this, new MessageTask(this, name, m._("login_msg"), interval));
+
             player.sendMessage(m._("logout"));
             ConsoleLogger.info(player.getDisplayName() + " logged out");
             return true;
@@ -379,7 +409,7 @@ public class AuthMe extends JavaPlugin {
                 int delay = settings.getRegistrationTimeout() * 20;
                 int interval = settings.getWarnMessageInterval();
                 BukkitScheduler sched = this.getServer().getScheduler();
-                if(delay != 0) {
+                if (delay != 0) {
                     int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
                     LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
                 }
