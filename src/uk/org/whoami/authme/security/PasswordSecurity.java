@@ -21,63 +21,53 @@ import java.security.NoSuchAlgorithmException;
 
 public class PasswordSecurity {
 
-    public enum Hash {
+    private static String getMD5(String message) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
 
-        MD5, SHA1, SHA256
-    }
-    private Hash hash;
-    private MessageDigest md5;
-    private MessageDigest sha256;
-    private MessageDigest sha1;
-
-    public PasswordSecurity(Hash hash) throws NullPointerException, NoSuchAlgorithmException {
-        if (hash == null) {
-            throw new NullPointerException("Hash can not be null");
-        }
-
-        this.hash = hash;
-        this.md5 = MessageDigest.getInstance("MD5");
-        this.sha256 = MessageDigest.getInstance("SHA-256");
-        this.sha1 = MessageDigest.getInstance("SHA1");
-
-    }
-
-    private String getMD5(String message) {
-        byte[] digest;
         md5.reset();
         md5.update(message.getBytes());
-        digest = md5.digest();
+        byte[] digest = md5.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
                 digest));
     }
 
-    private String getSHA1(String message) {
-        byte[] digest;
+    private static String getSHA1(String message) throws NoSuchAlgorithmException {
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1");
         sha1.reset();
         sha1.update(message.getBytes());
-        digest = sha1.digest();
+        byte[] digest = sha1.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
                 digest));
     }
 
-    private String getSHA256(String message) {
-        byte[] digest;
+    private static String getSHA256(String message) throws NoSuchAlgorithmException {
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+
         sha256.reset();
         sha256.update(message.getBytes());
-        digest = sha256.digest();
+        byte[] digest = sha256.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
                 digest));
     }
 
-    private String getSaltedHash(String message, String salt) {
+    public static String getWhirlpool(String message) {
+        Whirlpool w = new Whirlpool();
+        byte[] digest = new byte[Whirlpool.DIGESTBYTES];
+        w.NESSIEinit();
+        w.NESSIEadd(message);
+        w.NESSIEfinalize(digest);
+        return Whirlpool.display(digest);
+    }
+
+    private static String getSaltedHash(String message, String salt) throws NoSuchAlgorithmException {
         return "$SHA$" + salt + "$" + getSHA256(getSHA256(message) + salt);
     }
 
-    public String getHash(String password) throws NoSuchAlgorithmException {
-        switch (hash) {
+    public static String getHash(HashAlgorithm alg, String password) throws NoSuchAlgorithmException {
+        switch (alg) {
             case MD5:
                 return getMD5(password);
             case SHA1:
@@ -90,7 +80,7 @@ public class PasswordSecurity {
         }
     }
 
-    public boolean comparePasswordWithHash(String password, String hash) {
+    public static boolean comparePasswordWithHash(String password, String hash) throws NoSuchAlgorithmException {
         if (hash.length() == 32) {
             return hash.equals(getMD5(password));
         }
@@ -108,5 +98,10 @@ public class PasswordSecurity {
             }
         }
         return false;
+    }
+
+    public enum HashAlgorithm {
+
+        MD5, SHA1, SHA256
     }
 }

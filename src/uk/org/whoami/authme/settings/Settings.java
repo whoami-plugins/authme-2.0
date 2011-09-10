@@ -19,7 +19,7 @@ package uk.org.whoami.authme.settings;
 import java.io.File;
 import org.bukkit.util.config.Configuration;
 import uk.org.whoami.authme.security.PasswordSecurity;
-import uk.org.whoami.authme.security.PasswordSecurity.Hash;
+import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 
 public final class Settings extends Configuration{
     
@@ -180,16 +180,16 @@ public final class Settings extends Configuration{
         return getBoolean(key, true);
     }
     
-    public Hash getPasswordHash() {
+    public HashAlgorithm getPasswordHash() {
         String key = "settings.security.passwordHash";
         if(getString(key) == null) {
             setProperty(key, "SHA256");
         }
         
         String entry = getString(key);
-        if(entry.equals("MD5")) return PasswordSecurity.Hash.MD5;
-        if(entry.equals("SHA1")) return PasswordSecurity.Hash.SHA1;
-        if(entry.equals("SHA256")) return PasswordSecurity.Hash.SHA256;
+        if(entry.equals("MD5")) return PasswordSecurity.HashAlgorithm.MD5;
+        if(entry.equals("SHA1")) return PasswordSecurity.HashAlgorithm.SHA1;
+        if(entry.equals("SHA256")) return PasswordSecurity.HashAlgorithm.SHA256;
         
         return null;
     }

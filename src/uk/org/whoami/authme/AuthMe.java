@@ -41,6 +41,7 @@ import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
+import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
@@ -51,11 +52,12 @@ public class AuthMe extends JavaPlugin {
     private DataSource database;
     private Settings settings;
     private Messages m;
-    private PasswordSecurity pws;
+    HashAlgorithm alg;
 
     @Override
     public void onEnable() {
         this.settings = Settings.getInstance();
+        alg = settings.getPasswordHash();
         if (settings.getDataSource().equals("file")) {
             try {
                 database = new FileDataSource();
@@ -87,18 +89,6 @@ public class AuthMe extends JavaPlugin {
         }
 
         m = Messages.getInstance();
-
-        try {
-            pws = new PasswordSecurity(settings.getPasswordHash());
-        } catch (NoSuchAlgorithmException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
-        } catch (NullPointerException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
         AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
@@ -176,8 +166,7 @@ public class AuthMe extends JavaPlugin {
 
                 try {
                     String name = args[1].toLowerCase();
-                    String hash = pws.getHash(args[2]);
-
+                    String hash = PasswordSecurity.getHash(alg, args[2]);
 
                     if (database.isAuthAvailable(name)) {
                         sender.sendMessage(m._("user_regged"));
@@ -200,7 +189,7 @@ public class AuthMe extends JavaPlugin {
 
                 try {
                     String name = args[1].toLowerCase();
-                    String hash = pws.getHash(args[2]);
+                    String hash = PasswordSecurity.getHash(alg, args[2]);
 
                     PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
                     database.updatePassword(auth);
@@ -262,10 +251,8 @@ public class AuthMe extends JavaPlugin {
                 return true;
             }
 
-
-
             try {
-                String hash = pws.getHash(args[0]);
+                String hash = PasswordSecurity.getHash(alg, args[0]);
 
                 PlayerAuth auth = new PlayerAuth(name, hash, ip);
                 database.saveAuth(auth);
@@ -303,30 +290,35 @@ public class AuthMe extends JavaPlugin {
             }
 
             String hash = database.getAuth(name).getHash();
-            System.out.println(hash);
-            if (pws.comparePasswordWithHash(args[0], hash)) {
-                PlayerAuth auth = new PlayerAuth(name, hash, ip);
-                database.updateIP(auth);
-                PlayerCache.getInstance().addPlayer(auth);
-                LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
-                if (limbo != null) {
-                    player.getInventory().setContents(limbo.getInventory());
-                    player.getInventory().setArmorContents(limbo.getArmour());
-                    if (settings.isTeleportToSpawnEnabled()) {
-                        player.teleport(limbo.getLoc());
+
+            try {
+                if (PasswordSecurity.comparePasswordWithHash(args[0], hash)) {
+                    PlayerAuth auth = new PlayerAuth(name, hash, ip);
+                    database.updateIP(auth);
+                    PlayerCache.getInstance().addPlayer(auth);
+                    LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
+                    if (limbo != null) {
+                        player.getInventory().setContents(limbo.getInventory());
+                        player.getInventory().setArmorContents(limbo.getArmour());
+                        if (settings.isTeleportToSpawnEnabled()) {
+                            player.teleport(limbo.getLoc());
+                        }
+                        this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+                        LimboCache.getInstance().deleteLimboPlayer(name);
                     }
-                    this.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
-                    LimboCache.getInstance().deleteLimboPlayer(name);
-                }
-                player.sendMessage(m._("login"));
-                ConsoleLogger.info(player.getDisplayName() + " logged in!");
-            } else {
-                ConsoleLogger.info(player.getDisplayName() + " used the wrong password");
-                if (settings.isKickOnWrongPasswordEnabled()) {
-                    player.kickPlayer(m._("wrong_pwd"));
+                    player.sendMessage(m._("login"));
+                    ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 } else {
-                    player.sendMessage(m._("wrong_pwd"));
+                    ConsoleLogger.info(player.getDisplayName() + " used the wrong password");
+                    if (settings.isKickOnWrongPasswordEnabled()) {
+                        player.kickPlayer(m._("wrong_pwd"));
+                    } else {
+                        player.sendMessage(m._("wrong_pwd"));
+                    }
                 }
+            } catch (NoSuchAlgorithmException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                sender.sendMessage("Internal Error please read the server log");
             }
             return true;
         }
@@ -343,9 +335,9 @@ public class AuthMe extends JavaPlugin {
             }
 
             try {
-                String hashnew = pws.getHash(args[1]);
+                String hashnew = PasswordSecurity.getHash(alg, args[1]);
 
-                if (pws.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
+                if (PasswordSecurity.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
                     PlayerAuth auth = new PlayerAuth(name, hashnew, ip);
                     database.updatePassword(auth);
                     PlayerCache.getInstance().updatePlayer(auth);
@@ -397,28 +389,32 @@ public class AuthMe extends JavaPlugin {
                 player.sendMessage(m._("usage_unreg"));
                 return true;
             }
+            try {
+                if (PasswordSecurity.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
+                    PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
 
-            if (pws.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
-                PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
+                    LimboCache.getInstance().addLimboPlayer(player);
+                    player.getInventory().setArmorContents(new ItemStack[0]);
+                    player.getInventory().setContents(new ItemStack[36]);
+                    database.removeAuth(name);
 
-                LimboCache.getInstance().addLimboPlayer(player);
-                player.getInventory().setArmorContents(new ItemStack[0]);
-                player.getInventory().setContents(new ItemStack[36]);
-                database.removeAuth(name);
+                    int delay = settings.getRegistrationTimeout() * 20;
+                    int interval = settings.getWarnMessageInterval();
+                    BukkitScheduler sched = this.getServer().getScheduler();
+                    if (delay != 0) {
+                        int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
+                        LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+                    }
+                    sched.scheduleSyncDelayedTask(this, new MessageTask(this, name, m._("reg_msg"), interval));
 
-                int delay = settings.getRegistrationTimeout() * 20;
-                int interval = settings.getWarnMessageInterval();
-                BukkitScheduler sched = this.getServer().getScheduler();
-                if (delay != 0) {
-                    int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), delay);
-                    LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+                    player.sendMessage("unregistered");
+                    ConsoleLogger.info(player.getDisplayName() + " unregistered himself");
+                } else {
+                    player.sendMessage(m._("wrong_pwd"));
                 }
-                sched.scheduleSyncDelayedTask(this, new MessageTask(this, name, m._("reg_msg"), interval));
-
-                player.sendMessage("unregistered");
-                ConsoleLogger.info(player.getDisplayName() + " unregistered himself");
-            } else {
-                player.sendMessage(m._("wrong_pwd"));
+            } catch (NoSuchAlgorithmException ex) {
+                ConsoleLogger.showError(ex.getMessage());
+                sender.sendMessage("Internal Error please read the server log");
             }
             return true;
         }
