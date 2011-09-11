@@ -18,6 +18,7 @@ package uk.org.whoami.authme.settings;
 
 import java.io.File;
 import org.bukkit.util.config.Configuration;
+import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 
@@ -186,12 +187,12 @@ public final class Settings extends Configuration{
             setProperty(key, "SHA256");
         }
         
-        String entry = getString(key);
-        if(entry.equals("MD5")) return PasswordSecurity.HashAlgorithm.MD5;
-        if(entry.equals("SHA1")) return PasswordSecurity.HashAlgorithm.SHA1;
-        if(entry.equals("SHA256")) return PasswordSecurity.HashAlgorithm.SHA256;
-        
-        return null;
+        try {
+            return PasswordSecurity.HashAlgorithm.valueOf(getString(key));
+        } catch(IllegalArgumentException ex) {
+            ConsoleLogger.showError("Unknown Hash Algorithm; defaulting to SHA256");
+            return PasswordSecurity.HashAlgorithm.SHA256;
+        }
     }
     
     public boolean isCachingEnabled() {

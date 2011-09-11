@@ -18,8 +18,11 @@ package uk.org.whoami.authme.security;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class PasswordSecurity {
+
+    private static SecureRandom rnd = new SecureRandom();
 
     private static String getMD5(String message) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -66,6 +69,19 @@ public class PasswordSecurity {
         return "$SHA$" + salt + "$" + getSHA256(getSHA256(message) + salt);
     }
 
+    private static String getXAuth(String message, String salt) {
+        while (salt.length() < 12) {
+            salt += "f";
+        }
+        if (salt.length() > 12) {
+            salt = salt.substring(0, 12);
+        }
+
+        String hash = getWhirlpool(salt + message).toLowerCase();
+        int saltPos = (message.length() >= hash.length() ? hash.length() - 1 : message.length());
+        return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
+    }
+
     public static String getHash(HashAlgorithm alg, String password) throws NoSuchAlgorithmException {
         switch (alg) {
             case MD5:
@@ -73,8 +89,13 @@ public class PasswordSecurity {
             case SHA1:
                 return getSHA1(password);
             case SHA256:
-                String salt = Long.toHexString(Double.doubleToLongBits(Math.random()));
+                String salt = new BigInteger(80, rnd).toString(32);
                 return getSaltedHash(password, salt);
+            case WHIRLPOOL:
+                return getWhirlpool(password);
+            case XAUTH:
+                String xsalt = new BigInteger(60, rnd).toString(32);
+                return getXAuth(password, xsalt);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
@@ -87,6 +108,12 @@ public class PasswordSecurity {
 
         if (hash.length() == 40) {
             return hash.equals(getSHA1(password));
+        }
+
+        if (hash.length() == 140) {
+            int saltPos = (password.length() >= hash.length() ? hash.length() - 1 : password.length());
+            String salt = hash.substring(saltPos, saltPos + 12);
+            return hash.equals(getXAuth(password,salt));
         }
 
         if (hash.contains("$")) {
@@ -102,6 +129,6 @@ public class PasswordSecurity {
 
     public enum HashAlgorithm {
 
-        MD5, SHA1, SHA256
+        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH
     }
 }
