@@ -52,6 +52,7 @@ public final class Settings extends Configuration{
         isChatAllowed();
         getMaxNickLength();
         getMinNickLength();
+        getNickRegex();
         isMovementAllowed();
         getMovementRadius();
         isKickNonRegisteredEnabled();

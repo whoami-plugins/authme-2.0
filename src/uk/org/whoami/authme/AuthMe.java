@@ -129,6 +129,7 @@ public class AuthMe extends JavaPlugin {
                 Priority.Lowest, this);
         pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener,
                 Priority.Lowest, this);
+        onReload(this.getServer().getOnlinePlayers());
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
@@ -138,6 +139,51 @@ public class AuthMe extends JavaPlugin {
             database.close();
         }
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " disabled");
+    }
+
+    public void onReload(Player[] players) {
+        if (!settings.isForcedRegistrationEnabled()) {
+            return;
+        }
+
+        for (Player player : players) {
+            String name = player.getName().toLowerCase();
+            String ip = player.getAddress().getAddress().getHostAddress();
+
+            if (settings.isKickNonRegisteredEnabled()) {
+                if (!database.isAuthAvailable(name)) {
+                    player.kickPlayer(m._("reg_only"));
+                    break;
+                }
+            }
+
+            if (database.isAuthAvailable(name)) {
+                if (settings.isSessionsEnabled()) {
+                    PlayerAuth auth = database.getAuth(name);
+                    if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
+                        PlayerCache.getInstance().addPlayer(auth);
+                        player.sendMessage(m._("valid_session"));
+                        break;
+                    }
+                }
+            }
+
+            LimboCache.getInstance().addLimboPlayer(player);
+            player.getInventory().setArmorContents(new ItemStack[0]);
+            player.getInventory().setContents(new ItemStack[36]);
+            if (settings.isTeleportToSpawnEnabled()) {
+                player.teleport(player.getWorld().getSpawnLocation());
+            }
+            String msg = database.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
+            int time = settings.getRegistrationTimeout() * 20;
+            int msgInterval = settings.getWarnMessageInterval();
+            BukkitScheduler sched = this.getServer().getScheduler();
+            if (time != 0) {
+                int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), time);
+                LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+            }
+            sched.scheduleSyncDelayedTask(this, new MessageTask(this, name, msg, msgInterval));
+        }
     }
 
     @Override
