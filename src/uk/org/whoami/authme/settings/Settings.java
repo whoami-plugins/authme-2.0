@@ -19,6 +19,8 @@ package uk.org.whoami.authme.settings;
 import java.io.File;
 import org.bukkit.util.config.Configuration;
 import uk.org.whoami.authme.ConsoleLogger;
+import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.datasource.DataSource.DataSourceType;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 
@@ -204,12 +206,18 @@ public final class Settings extends Configuration{
         return getBoolean(key, true);
     }
 
-    public String getDataSource() {
+    public DataSourceType getDataSource() {
         String key = "DataSource.backend";
         if(getString(key) == null) {
             setProperty(key, "file");
         }
-        return getString(key);
+
+        try {
+            return DataSource.DataSourceType.valueOf(getString(key).toUpperCase());
+        } catch(IllegalArgumentException ex) {
+            ConsoleLogger.showError("Unknown database backend; defaulting to file database");
+            return DataSource.DataSourceType.FILE;
+        }
     }
 
     public String getMySQLHost() {

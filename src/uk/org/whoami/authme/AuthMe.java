@@ -42,7 +42,6 @@ import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
-import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
@@ -53,43 +52,40 @@ public class AuthMe extends JavaPlugin {
     private DataSource database;
     private Settings settings;
     private Messages m;
-    HashAlgorithm alg;
 
     @Override
     public void onEnable() {
-        this.settings = Settings.getInstance();
-        alg = settings.getPasswordHash();
-        if (settings.getDataSource().equals("file")) {
-            try {
-                database = new FileDataSource();
-            } catch (IOException ex) {
-                ConsoleLogger.showError(ex.getMessage());
-                this.getServer().getPluginManager().disablePlugin(this);
-                return;
-            }
-        } else if (settings.getDataSource().equals("mysql")) {
-            try {
-                database = new MySQLDataSource();
-            } catch (ClassNotFoundException ex) {
-                ConsoleLogger.showError(ex.getMessage());
-                this.getServer().getPluginManager().disablePlugin(this);
-                return;
-            } catch (SQLException ex) {
-                ConsoleLogger.showError(ex.getMessage());
-                this.getServer().getPluginManager().disablePlugin(this);
-                return;
-            }
-        } else {
-            ConsoleLogger.showError("Unknown database type");
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
+        settings = Settings.getInstance();
+        m = Messages.getInstance();
+
+        switch (settings.getDataSource()) {
+            case FILE:
+                try {
+                    database = new FileDataSource();
+                } catch (IOException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    this.getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+                break;
+            case MYSQL:
+                try {
+                    database = new MySQLDataSource();
+                } catch (ClassNotFoundException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    this.getServer().getPluginManager().disablePlugin(this);
+                    return;
+                } catch (SQLException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    this.getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+                break;
         }
 
         if (settings.isCachingEnabled()) {
             database = new CacheDataSource(database);
         }
-
-        m = Messages.getInstance();
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
         AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
@@ -150,7 +146,7 @@ public class AuthMe extends JavaPlugin {
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " disabled");
     }
 
-    public void onReload(Player[] players) {
+    private void onReload(Player[] players) {
         if (!settings.isForcedRegistrationEnabled()) {
             return;
         }
@@ -180,9 +176,11 @@ public class AuthMe extends JavaPlugin {
             LimboCache.getInstance().addLimboPlayer(player);
             player.getInventory().setArmorContents(new ItemStack[0]);
             player.getInventory().setContents(new ItemStack[36]);
+
             if (settings.isTeleportToSpawnEnabled()) {
                 player.teleport(player.getWorld().getSpawnLocation());
             }
+
             String msg = database.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
             int time = settings.getRegistrationTimeout() * 20;
             int msgInterval = settings.getWarnMessageInterval();
