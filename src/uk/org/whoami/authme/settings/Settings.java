@@ -23,25 +23,25 @@ import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 
 public final class Settings extends Configuration{
-    
+
     public static final String PLUGIN_FOLDER = "./plugins/AuthMe";
     public static final String CACHE_FOLDER = Settings.PLUGIN_FOLDER + "/cache";
     public static final String AUTH_FILE = Settings.PLUGIN_FOLDER + "/auths.db";
     public static final String MESSAGE_FILE = Settings.PLUGIN_FOLDER + "/messages.yml";
     public static final String SETTINGS_FILE = Settings.PLUGIN_FOLDER + "/config.yml";
-    
+
     private static Settings singleton;
-    
+
     private Settings() {
         super(new File(Settings.PLUGIN_FOLDER + "/config.yml"));
         reload();
     }
-    
+
     public void reload() {
         load();
         write();
     }
-    
+
     private void write() {
         isRegistrationEnabled();
         isForcedRegistrationEnabled();
@@ -69,7 +69,7 @@ public final class Settings extends Configuration{
         getMySQLColumnPassword();
         save();
     }
-    
+
     public boolean isForcedRegistrationEnabled() {
         String key = "settings.registration.force";
         if(getString(key) == null) {
@@ -77,7 +77,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, true);
     }
-    
+
     public boolean isRegistrationEnabled() {
         String key = "settings.registration.enabled";
         if(getString(key) == null) {
@@ -85,7 +85,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, true);
     }
-    
+
     public int getWarnMessageInterval() {
         String key = "settings.registration.messageInterval";
         if(getString(key) == null) {
@@ -93,7 +93,7 @@ public final class Settings extends Configuration{
         }
         return getInt(key, 5);
     }
-    
+
     public boolean isSessionsEnabled() {
         String key = "settings.sessions";
         if(getString(key) == null) {
@@ -101,7 +101,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, false);
     }
-    
+
     public boolean isKickOnWrongPasswordEnabled() {
         String key = "settings.restrictions.kickOnWrongPassword";
         if(getString(key) == null) {
@@ -109,7 +109,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, false);
     }
-    
+
     public int getMinNickLength() {
         String key = "settings.restrictions.minNicknameLength";
         if(getString(key) == null) {
@@ -117,7 +117,7 @@ public final class Settings extends Configuration{
         }
         return getInt(key, 3);
     }
-    
+
     public int getMaxNickLength() {
         String key = "settings.restrictions.maxNicknameLength";
         if(getString(key) == null) {
@@ -125,7 +125,7 @@ public final class Settings extends Configuration{
         }
         return getInt(key, 20);
     }
-    
+
     public String getNickRegex() {
         String key = "settings.restrictions.allowedNicknameCharacters";
         if(getString(key) == null) {
@@ -133,7 +133,7 @@ public final class Settings extends Configuration{
         }
         return getString(key, "[a-zA-Z0-9_?]*");
     }
-    
+
     public int getRegistrationTimeout() {
         String key = "settings.restrictions.timeout";
         if(getString(key) == null) {
@@ -141,7 +141,7 @@ public final class Settings extends Configuration{
         }
         return getInt(key, 30);
     }
-    
+
     public boolean isChatAllowed() {
         String key = "settings.restrictions.allowChat";
         if(getString(key) == null) {
@@ -149,7 +149,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, false);
     }
-    
+
     public boolean isMovementAllowed() {
         String key = "settings.restrictions.allowMovement";
         if(getString(key) == null) {
@@ -157,7 +157,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, false);
     }
-    
+
     public int getMovementRadius() {
         String key = "settings.restrictions.allowedMovementRadius";
         if(getString(key) == null) {
@@ -165,7 +165,7 @@ public final class Settings extends Configuration{
         }
         return getInt(key, 100);
     }
-    
+
     public boolean isKickNonRegisteredEnabled() {
         String key = "settings.restrictions.kickNonRegistered";
         if(getString(key) == null) {
@@ -173,7 +173,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, false);
     }
-    
+
     public boolean isTeleportToSpawnEnabled() {
         String key = "settings.restrictions.teleportUnAuthedToSpawn";
         if(getString(key) == null) {
@@ -181,21 +181,21 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, true);
     }
-    
+
     public HashAlgorithm getPasswordHash() {
         String key = "settings.security.passwordHash";
         if(getString(key) == null) {
             setProperty(key, "SHA256");
         }
-        
+
         try {
-            return PasswordSecurity.HashAlgorithm.valueOf(getString(key));
+            return PasswordSecurity.HashAlgorithm.valueOf(getString(key).toUpperCase());
         } catch(IllegalArgumentException ex) {
             ConsoleLogger.showError("Unknown Hash Algorithm; defaulting to SHA256");
             return PasswordSecurity.HashAlgorithm.SHA256;
         }
     }
-    
+
     public boolean isCachingEnabled() {
         String key ="DataSource.caching";
         if(getString(key) == null) {
@@ -203,7 +203,7 @@ public final class Settings extends Configuration{
         }
         return getBoolean(key, true);
     }
-    
+
     public String getDataSource() {
         String key = "DataSource.backend";
         if(getString(key) == null) {
@@ -211,7 +211,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-    
+
     public String getMySQLHost() {
         String key = "DataSource.mySQLHost";
         if(getString(key) == null) {
@@ -219,7 +219,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-    
+
     public String getMySQLPort() {
         String key = "DataSource.mySQLPort";
         if(getString(key) == null) {
@@ -227,7 +227,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-    
+
     public String getMySQLUsername() {
         String key = "DataSource.mySQLUsername";
         if(getString(key) == null) {
@@ -243,7 +243,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-    
+
     public String getMySQLDatabase() {
         String key = "DataSource.mySQLDatabase";
         if(getString(key) == null) {
@@ -251,7 +251,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-        
+
     public String getMySQLTablename() {
         String key = "DataSource.mySQLTablename";
         if(getString(key) == null) {
@@ -275,7 +275,7 @@ public final class Settings extends Configuration{
         }
         return getString(key);
     }
-    
+
     public static Settings getInstance() {
         if(singleton == null) {
             singleton = new Settings();
