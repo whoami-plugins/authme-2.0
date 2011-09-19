@@ -33,7 +33,7 @@ public class PasswordSecurity {
         byte[] digest = md5.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
-                digest));
+                                                                               digest));
     }
 
     private static String getSHA1(String message) throws NoSuchAlgorithmException {
@@ -43,7 +43,7 @@ public class PasswordSecurity {
         byte[] digest = sha1.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
-                digest));
+                                                                               digest));
     }
 
     private static String getSHA256(String message) throws NoSuchAlgorithmException {
@@ -54,7 +54,7 @@ public class PasswordSecurity {
         byte[] digest = sha256.digest();
 
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,
-                digest));
+                                                                               digest));
     }
 
     public static String getWhirlpool(String message) {
@@ -114,7 +114,7 @@ public class PasswordSecurity {
         if (hash.length() == 140) {
             int saltPos = (password.length() >= hash.length() ? hash.length() - 1 : password.length());
             String salt = hash.substring(saltPos, saltPos + 12);
-            return hash.equals(getXAuth(password,salt));
+            return hash.equals(getXAuth(password, salt));
         }
 
         if (hash.contains("$")) {

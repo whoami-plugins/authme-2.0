@@ -112,7 +112,7 @@ public class AdminCommand implements CommandExecutor {
 
             String name = args[1].toLowerCase();
 
-            if(!database.removeAuth(name)) {
+            if (!database.removeAuth(name)) {
                 sender.sendMessage(m._("error"));
                 return true;
             }

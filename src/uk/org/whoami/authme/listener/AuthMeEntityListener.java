@@ -65,7 +65,7 @@ public class AuthMeEntityListener extends EntityListener {
         if (event.isCancelled()) {
             return;
         }
-        
+
         Entity entity = event.getEntity();
         if (!(entity instanceof Player)) {
             return;

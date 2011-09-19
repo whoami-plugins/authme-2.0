@@ -20,7 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 public class LimboPlayer {
-    
+
     private String name;
     private ItemStack[] inventory;
     private ItemStack[] armour;
@@ -37,7 +37,7 @@ public class LimboPlayer {
     public String getName() {
         return name;
     }
-    
+
     public Location getLoc() {
         return loc;
     }

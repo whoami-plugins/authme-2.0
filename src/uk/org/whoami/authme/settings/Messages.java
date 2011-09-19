@@ -35,34 +35,34 @@ public class Messages extends Configuration {
     private void loadDefaults() {
         map.put("logged_in", "&cAlready logged in!");
         map.put("not_logged_in", "&cNot logged in!");
-        map.put("reg_disabled","&cRegistration is disabled");
+        map.put("reg_disabled", "&cRegistration is disabled");
         map.put("user_regged", "&cUsername already registered");
         map.put("usage_reg", "&cUsage: /register password");
         map.put("usage_log", "&cUsage: /login password");
         map.put("user_unknown", "&cUsername not registered");
         map.put("pwd_changed", "&cPassword changed!");
-        map.put("reg_only","Registered players only! Please visit http://example.com to register");
+        map.put("reg_only", "Registered players only! Please visit http://example.com to register");
         map.put("valid_session", "&cSession login");
         map.put("login_msg", "&cPlease login with \"/login password\"");
         map.put("reg_msg", "&cPlease register with \"/register password\"");
         map.put("timeout", "Login Timeout");
         map.put("wrong_pwd", "&cWrong password");
-        map.put("logout","&cSuccessful logout");
-        map.put("usage_unreg","&cUsage: /unregister password");
+        map.put("logout", "&cSuccessful logout");
+        map.put("usage_unreg", "&cUsage: /unregister password");
         map.put("registered", "&cSuccessfully registered!");
-        map.put("unregistered","&cSuccessfully unregistered!");
+        map.put("unregistered", "&cSuccessfully unregistered!");
         map.put("login", "&cSuccessful login!");
-        map.put("no_perm","&cNo Permission");
+        map.put("no_perm", "&cNo Permission");
         map.put("same_nick", "Same nick is already playing");
         map.put("reg_voluntarily", "You can register your nickname with the server with the command \"/register password\"");
         map.put("reload", "Configuration and database has been reloaded");
-        map.put("error","An error ocurred; Please contact the admin");
+        map.put("error", "An error ocurred; Please contact the admin");
     }
 
     private void loadFile() {
         this.load();
-        for(String key : map.keySet()) {
-            if(this.getString(key) == null) {
+        for (String key : map.keySet()) {
+            if (this.getString(key) == null) {
                 this.setProperty(key, map.get(key));
             } else {
                 map.put(key, this.getString(key));
@@ -73,7 +73,7 @@ public class Messages extends Configuration {
 
     public String _(String msg) {
         String loc = map.get(msg);
-        if(loc != null) {
+        if (loc != null) {
             return loc.replace("&", "\u00a7");
         }
         return msg;
@@ -84,7 +84,7 @@ public class Messages extends Configuration {
     }
 
     public static Messages getInstance() {
-        if(singleton == null) {
+        if (singleton == null) {
             singleton = new Messages();
         }
         return singleton;

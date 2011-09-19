@@ -47,12 +47,14 @@ public class PlayerAuth {
     public void setIp(String ip) {
         this.ip = ip;
     }
-        
+
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof PlayerAuth)) return false;
+        if (!(obj instanceof PlayerAuth)) {
+            return false;
+        }
         PlayerAuth other = (PlayerAuth) obj;
-        if(other.getIp().equals(this.ip) && other.getNickname().equals(this.nickname)) {
+        if (other.getIp().equals(this.ip) && other.getNickname().equals(this.nickname)) {
             return true;
         } else {
             return false;

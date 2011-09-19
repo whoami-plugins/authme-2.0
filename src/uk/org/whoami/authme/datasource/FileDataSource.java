@@ -245,7 +245,7 @@ public class FileDataSource implements DataSource {
 
     @Override
     public synchronized HashMap<String, PlayerAuth> getAllRegisteredUsers() {
-        HashMap<String,PlayerAuth> map = new HashMap<String,PlayerAuth>();
+        HashMap<String, PlayerAuth> map = new HashMap<String, PlayerAuth>();
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(source));
@@ -276,8 +276,10 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public synchronized void close() {}
+    public synchronized void close() {
+    }
 
     @Override
-    public void reload() {}
+    public void reload() {
+    }
 }

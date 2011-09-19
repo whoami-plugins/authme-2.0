@@ -95,7 +95,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
@@ -122,7 +122,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
@@ -133,18 +133,18 @@ public class AuthMePlayerListener extends PlayerListener {
             }
 
             if (settings.isMovementAllowed()) {
-                if(settings.getMovementRadius() > 0) {
+                if (settings.getMovementRadius() > 0) {
                     int radius = settings.getMovementRadius();
                     System.out.println(radius);
                     Location spawn = player.getWorld().getSpawnLocation();
                     Location to = event.getTo();
-                    if(to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius) {
+                    if (to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius) {
                         event.setCancelled(true);
                     }
-                    if(to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius) {
+                    if (to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius) {
                         event.setCancelled(true);
                     }
-                    if(to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
+                    if (to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
                         event.setCancelled(true);
                     }
                     event.setTo(to);
@@ -163,20 +163,20 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         int min = settings.getMinNickLength();
         int max = settings.getMaxNickLength();
         String regex = settings.getNickRegex();
-        
-        if(name.length() > max || name.length() < min) {
+
+        if (name.length() > max || name.length() < min) {
             event.disallow(Result.KICK_OTHER, "Your nickname has the wrong length. MaxLen: " + max + ", MinLen: " + min);
             return;
         }
-        if(!player.getName().matches(regex) || name.equals("Player")) {
+        if (!player.getName().matches(regex) || name.equals("Player")) {
             event.disallow(Result.KICK_OTHER, "Your nickname contains illegal characters. Allowed chars: " + regex);
             return;
         }
-        
+
         //Remove doubles from premises
         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
             if (onlinePlayer.getName().equals(player.getName())) {
@@ -225,7 +225,7 @@ public class AuthMePlayerListener extends PlayerListener {
         LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
-        if(settings.isTeleportToSpawnEnabled()) {
+        if (settings.isTeleportToSpawnEnabled()) {
             player.teleport(player.getWorld().getSpawnLocation());
         }
 
@@ -233,11 +233,11 @@ public class AuthMePlayerListener extends PlayerListener {
         int time = settings.getRegistrationTimeout() * 20;
         int msgInterval = settings.getWarnMessageInterval();
         BukkitScheduler sched = plugin.getServer().getScheduler();
-        if(time != 0) {
+        if (time != 0) {
             int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
             LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
         }
-        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));  
+        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
     }
 
     @Override
@@ -285,17 +285,17 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
         }
-        
+
         event.setCancelled(true);
     }
 
@@ -307,20 +307,20 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
         }
-        
+
         event.setCancelled(true);
     }
-    
+
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
@@ -328,23 +328,23 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
-        if(settings.isTeleportToSpawnEnabled() && event.getTo().equals(player.getWorld().getSpawnLocation())) {
+
+        if (settings.isTeleportToSpawnEnabled() && event.getTo().equals(player.getWorld().getSpawnLocation())) {
             return;
         }
-                
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
-        }       
+        }
         event.setCancelled(true);
     }
-    
+
     @Override
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
@@ -352,19 +352,19 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
-        }       
+        }
         event.setCancelled(true);
     }
-    
+
     @Override
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
@@ -372,19 +372,19 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
-        }       
+        }
         event.setCancelled(true);
     }
-    
+
     @Override
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
@@ -392,16 +392,16 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-        
+
         if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
             return;
         }
-        
-        if(!data.isAuthAvailable(name)) {
+
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
-        }       
+        }
         event.setCancelled(true);
     }
 }

@@ -65,7 +65,7 @@ public class LogoutCommand implements CommandExecutor {
         LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
-        if(settings.isTeleportToSpawnEnabled()) {
+        if (settings.isTeleportToSpawnEnabled()) {
             player.teleport(player.getWorld().getSpawnLocation());
         }
 

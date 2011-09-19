@@ -94,39 +94,39 @@ public class AuthMe extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener,
-                Priority.Low, this);
+                         Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener,
-                Priority.Low, this);
+                         Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_BED_ENTER, playerListener,
-                Priority.Low, this);
+                         Priority.Low, this);
         pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener,
-                Priority.Lowest, this);
+                         Priority.Lowest, this);
 
         this.getCommand("authme").setExecutor(new AdminCommand(database));
         this.getCommand("register").setExecutor(new RegisterCommand(database));

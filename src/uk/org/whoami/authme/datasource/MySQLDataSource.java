@@ -245,11 +245,11 @@ public class MySQLDataSource implements DataSource {
         try {
             pst = con.prepareStatement("SELECT * FROM " + tableName + ";");
             ResultSet rs = pst.executeQuery();
-            while(rs.next()) {
-                if(rs.getString(3).isEmpty()) {
-                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2),rs.getString(3),"198.18.0.1"));
+            while (rs.next()) {
+                if (rs.getString(3).isEmpty()) {
+                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2), rs.getString(3), "198.18.0.1"));
                 } else {
-                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2),rs.getString(3),rs.getString(4)));
+                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2), rs.getString(3), rs.getString(4)));
                 }
             }
         } catch (SQLException ex) {
@@ -268,7 +268,7 @@ public class MySQLDataSource implements DataSource {
 
     @Override
     public synchronized void close() {
-        if(con != null) {
+        if (con != null) {
             try {
                 con.close();
             } catch (SQLException ex) {
