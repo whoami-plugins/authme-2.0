@@ -37,7 +37,7 @@ public class TimeoutTask implements Runnable {
     public String getName() {
         return name;
     }
-    
+
     @Override
     public void run() {
         if (PlayerCache.getInstance().isAuthenticated(name)) {

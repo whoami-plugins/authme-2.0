@@ -21,7 +21,7 @@ import java.util.HashMap;
 import org.bukkit.util.config.Configuration;
 
 public class Messages extends Configuration {
-    
+
     private static Messages singleton = null;
     private HashMap<String, String> map;
 
@@ -31,7 +31,7 @@ public class Messages extends Configuration {
         loadDefaults();
         loadFile();
     }
-    
+
     private void loadDefaults() {
         map.put("logged_in", "&cAlready logged in!");
         map.put("not_logged_in", "&cNot logged in!");
@@ -56,6 +56,7 @@ public class Messages extends Configuration {
         map.put("same_nick", "Same nick is already playing");
         map.put("reg_voluntarily", "You can register your nickname with the server with the command \"/register password\"");
         map.put("reload", "Configuration and database has been reloaded");
+        map.put("error","An error ocurred; Please contact the admin");
     }
 
     private void loadFile() {
@@ -69,7 +70,7 @@ public class Messages extends Configuration {
         }
         this.save();
     }
-    
+
     public String _(String msg) {
         String loc = map.get(msg);
         if(loc != null) {
@@ -77,11 +78,11 @@ public class Messages extends Configuration {
         }
         return msg;
     }
-    
+
     public void reload() {
         loadFile();
     }
-    
+
     public static Messages getInstance() {
         if(singleton == null) {
             singleton = new Messages();
