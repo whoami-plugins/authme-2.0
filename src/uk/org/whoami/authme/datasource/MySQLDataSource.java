@@ -37,6 +37,7 @@ public class MySQLDataSource implements DataSource {
     private String tableName;
     private String columnName;
     private String columnPassword;
+    private String columnIp;
     private Connection con;
 
     public MySQLDataSource() throws ClassNotFoundException, SQLException {
@@ -50,6 +51,7 @@ public class MySQLDataSource implements DataSource {
         this.tableName = s.getMySQLTablename();
         this.columnName = s.getMySQLColumnName();
         this.columnPassword = s.getMySQLColumnPassword();
+        this.columnIp = s.getMySQLColumnIp();
 
         connect();
         setup();
@@ -71,15 +73,15 @@ public class MySQLDataSource implements DataSource {
             st = con.createStatement();
             st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
                     + "id INTEGER AUTO_INCREMENT,"
-                    + columnName + " VARCHAR(20) NOT NULL,"
-                    + columnPassword + " VARCHAR(100) NOT NULL,"
-                    + "ip VARCHAR(40) NOT NULL,"
+                    + columnName + " VARCHAR(255) NOT NULL,"
+                    + columnPassword + " VARCHAR(255) NOT NULL,"
+                    + columnIp + " VARCHAR(40) NOT NULL,"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
 
-            rs = con.getMetaData().getColumns(null, null, tableName, "ip");
+            rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
             if (!rs.next()) {
                 st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN "
-                        + "ip VARCHAR(40) NOT NULL;");
+                        + columnIp + " VARCHAR(40) NOT NULL;");
             }
         } finally {
             if (st != null) {
@@ -154,7 +156,7 @@ public class MySQLDataSource implements DataSource {
     public synchronized boolean saveAuth(PlayerAuth auth) {
         PreparedStatement pst = null;
         try {
-            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + ",ip) VALUES (?,?,?);");
+            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + ") VALUES (?,?,?);");
             pst.setString(1, auth.getNickname());
             pst.setString(2, auth.getHash());
             pst.setString(3, auth.getIp());
@@ -177,7 +179,7 @@ public class MySQLDataSource implements DataSource {
     public synchronized boolean updateIP(PlayerAuth auth) {
         PreparedStatement pst = null;
         try {
-            pst = con.prepareStatement("UPDATE " + tableName + " SET ip=? WHERE " + columnName + "=?;");
+            pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnIp + "=? WHERE " + columnName + "=?;");
             pst.setString(1, auth.getIp());
             pst.setString(2, auth.getNickname());
             pst.executeUpdate();

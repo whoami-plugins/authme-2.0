@@ -68,6 +68,7 @@ public final class Settings extends Configuration {
         getMySQLTablename();
         getMySQLColumnName();
         getMySQLColumnPassword();
+        getMySQLColumnIp();
         save();
     }
 
@@ -279,6 +280,14 @@ public final class Settings extends Configuration {
         String key = "DataSource.mySQLColumnPassword";
         if (getString(key) == null) {
             setProperty(key, "password");
+        }
+        return getString(key);
+    }
+
+    public String getMySQLColumnIp() {
+        String key = "DataSource.mySQLColumnIp";
+        if (getString(key) == null) {
+            setProperty(key, "ip");
         }
         return getString(key);
     }
