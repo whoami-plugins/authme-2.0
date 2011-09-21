@@ -83,6 +83,16 @@ public class PasswordSecurity {
         return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
     }
 
+    private static String createSalt(int length) throws NoSuchAlgorithmException {
+        byte[] msg = new byte[40];
+        rnd.nextBytes(msg);
+
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+        sha1.reset();
+        byte[] digest = sha1.digest(msg);
+        return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,digest)).substring(0, length);
+    }
+
     public static String getHash(HashAlgorithm alg, String password) throws NoSuchAlgorithmException {
         switch (alg) {
             case MD5:
@@ -90,12 +100,12 @@ public class PasswordSecurity {
             case SHA1:
                 return getSHA1(password);
             case SHA256:
-                String salt = new BigInteger(80, rnd).toString(32);
+                String salt = createSalt(16);
                 return getSaltedHash(password, salt);
             case WHIRLPOOL:
                 return getWhirlpool(password);
             case XAUTH:
-                String xsalt = new BigInteger(60, rnd).toString(32);
+                String xsalt = createSalt(12);
                 return getXAuth(password, xsalt);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
