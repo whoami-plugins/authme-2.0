@@ -71,13 +71,6 @@ public class PasswordSecurity {
     }
 
     private static String getXAuth(String message, String salt) {
-        while (salt.length() < 12) {
-            salt += "f";
-        }
-        if (salt.length() > 12) {
-            salt = salt.substring(0, 12);
-        }
-
         String hash = getWhirlpool(salt + message).toLowerCase();
         int saltPos = (message.length() >= hash.length() ? hash.length() - 1 : message.length());
         return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
@@ -121,7 +114,7 @@ public class PasswordSecurity {
             return hash.equals(getSHA1(password));
         }
 
-        if (hash.length() == 140) {
+        if (hash.length() == 138) {
             int saltPos = (password.length() >= hash.length() ? hash.length() - 1 : password.length());
             String salt = hash.substring(saltPos, saltPos + 12);
             return hash.equals(getXAuth(password, salt));
