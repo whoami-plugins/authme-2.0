@@ -43,6 +43,7 @@ public class CacheDataSource implements DataSource {
     public synchronized boolean saveAuth(PlayerAuth auth) {
         if (source.saveAuth(auth)) {
             cache.put(auth.getNickname(), auth);
+            return true;
         }
         return false;
     }
