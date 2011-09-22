@@ -135,7 +135,6 @@ public class AuthMePlayerListener extends PlayerListener {
             if (settings.isMovementAllowed()) {
                 if (settings.getMovementRadius() > 0) {
                     int radius = settings.getMovementRadius();
-                    System.out.println(radius);
                     Location spawn = player.getWorld().getSpawnLocation();
                     Location to = event.getTo();
                     if (to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius) {
