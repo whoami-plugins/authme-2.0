@@ -114,7 +114,7 @@ public class PasswordSecurity {
             return hash.equals(getSHA1(password));
         }
 
-        if (hash.length() == 138) {
+        if (hash.length() == 140) {
             int saltPos = (password.length() >= hash.length() ? hash.length() - 1 : password.length());
             String salt = hash.substring(saltPos, saltPos + 12);
             return hash.equals(getXAuth(password, salt));
