@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -38,6 +39,7 @@ public class MySQLDataSource implements DataSource {
     private String columnName;
     private String columnPassword;
     private String columnIp;
+    private String columnLastLogin;
     private Connection con;
 
     public MySQLDataSource() throws ClassNotFoundException, SQLException {
@@ -52,6 +54,7 @@ public class MySQLDataSource implements DataSource {
         this.columnName = s.getMySQLColumnName();
         this.columnPassword = s.getMySQLColumnPassword();
         this.columnIp = s.getMySQLColumnIp();
+        this.columnLastLogin = s.getMySQLColumnLastLogin();
 
         connect();
         setup();
@@ -76,6 +79,7 @@ public class MySQLDataSource implements DataSource {
                     + columnName + " VARCHAR(255) NOT NULL,"
                     + columnPassword + " VARCHAR(255) NOT NULL,"
                     + columnIp + " VARCHAR(40) NOT NULL,"
+                    + columnLastLogin + " TIMESTAMP,"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
@@ -83,6 +87,13 @@ public class MySQLDataSource implements DataSource {
                 st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN "
                         + columnIp + " VARCHAR(40) NOT NULL;");
             }
+            rs.close();
+            rs = con.getMetaData().getColumns(null, null, tableName, columnLastLogin);
+            if (!rs.next()) {
+                st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN "
+                        + columnLastLogin + " TIMESTAMP;");
+            }
+
         } finally {
             if (st != null) {
                 try {
@@ -132,9 +143,9 @@ public class MySQLDataSource implements DataSource {
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 if (rs.getString(columnIp).isEmpty()) {
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1");
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getTimestamp(columnLastLogin));
                 } else {
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getTimestamp(columnLastLogin));
                 }
             } else {
                 return null;
@@ -156,32 +167,11 @@ public class MySQLDataSource implements DataSource {
     public synchronized boolean saveAuth(PlayerAuth auth) {
         PreparedStatement pst = null;
         try {
-            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + ") VALUES (?,?,?);");
+            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + ") VALUES (?,?,?,?);");
             pst.setString(1, auth.getNickname());
             pst.setString(2, auth.getHash());
             pst.setString(3, auth.getIp());
-            pst.executeUpdate();
-        } catch (SQLException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-            return false;
-        } finally {
-            if (pst != null) {
-                try {
-                    pst.close();
-                } catch (SQLException ex) {
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public synchronized boolean updateIP(PlayerAuth auth) {
-        PreparedStatement pst = null;
-        try {
-            pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnIp + "=? WHERE " + columnName + "=?;");
-            pst.setString(1, auth.getIp());
-            pst.setString(2, auth.getNickname());
+            pst.setTimestamp(4, new Timestamp(auth.getLastLogin().getTime()));
             pst.executeUpdate();
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
@@ -204,6 +194,29 @@ public class MySQLDataSource implements DataSource {
             pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnPassword + "=? WHERE " + columnName + "=?;");
             pst.setString(1, auth.getHash());
             pst.setString(2, auth.getNickname());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (pst != null) {
+                try {
+                    pst.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean updateLogin(PlayerAuth auth) {
+        PreparedStatement pst = null;
+        try {
+            pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnIp + "=?, " + columnLastLogin + "=? WHERE " + columnName + "=?;");
+            pst.setString(1, auth.getIp());
+            pst.setTimestamp(2, new Timestamp(auth.getLastLogin().getTime()));
+            pst.setString(3, auth.getNickname());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
@@ -249,9 +262,9 @@ public class MySQLDataSource implements DataSource {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 if (rs.getString(columnIp).isEmpty()) {
-                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1"));
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getTimestamp(columnLastLogin)));
                 } else {
-                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp)));
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getTimestamp(columnLastLogin)));
                 }
             }
         } catch (SQLException ex) {

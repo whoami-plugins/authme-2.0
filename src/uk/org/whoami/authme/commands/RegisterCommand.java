@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -79,7 +80,7 @@ public class RegisterCommand implements CommandExecutor {
         try {
             String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[0]);
 
-            PlayerAuth auth = new PlayerAuth(name, hash, ip);
+            PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date());
             if (!database.saveAuth(auth)) {
                 player.sendMessage(m._("error"));
                 return true;

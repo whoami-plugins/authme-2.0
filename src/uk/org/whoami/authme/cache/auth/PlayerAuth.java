@@ -16,16 +16,20 @@
 
 package uk.org.whoami.authme.cache.auth;
 
+import java.util.Date;
+
 public class PlayerAuth {
 
     private String nickname;
     private String hash;
     private String ip;
+    private Date lastLogin;
 
-    public PlayerAuth(String nickname, String hash, String ip) {
+    public PlayerAuth(String nickname, String hash, String ip, Date lastLogin) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
+        this.lastLogin = lastLogin;
     }
 
     public String getIp() {
@@ -40,12 +44,20 @@ public class PlayerAuth {
         return hash;
     }
 
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
     public void setHash(String hash) {
         this.hash = hash;
     }
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     @Override

@@ -49,18 +49,19 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public synchronized boolean updateIP(PlayerAuth auth) {
-        if (source.updateIP(auth)) {
-            cache.get(auth.getNickname()).setIp(auth.getIp());
+    public synchronized boolean updatePassword(PlayerAuth auth) {
+        if (source.updatePassword(auth)) {
+            cache.get(auth.getNickname()).setHash(auth.getHash());
             return true;
         }
         return false;
     }
 
     @Override
-    public synchronized boolean updatePassword(PlayerAuth auth) {
-        if (source.updatePassword(auth)) {
+    public boolean updateLogin(PlayerAuth auth) {
+        if (source.updateLogin(auth)) {
             cache.get(auth.getNickname()).setHash(auth.getHash());
+            cache.get(auth.getNickname()).setLastLogin(auth.getLastLogin());
             return true;
         }
         return false;

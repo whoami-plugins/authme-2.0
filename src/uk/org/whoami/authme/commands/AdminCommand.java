@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -70,7 +71,7 @@ public class AdminCommand implements CommandExecutor {
                     return true;
                 }
 
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
+                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", new Date(0));
                 if (!database.saveAuth(auth)) {
                     sender.sendMessage(m._("error"));
                     return true;
@@ -91,7 +92,7 @@ public class AdminCommand implements CommandExecutor {
                 String name = args[1].toLowerCase();
                 String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[2]);
 
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1");
+                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", new Date(0));
 
                 if (!database.updatePassword(auth)) {
                     sender.sendMessage(m._("error"));

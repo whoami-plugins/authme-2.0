@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -75,8 +76,8 @@ public class LoginCommand implements CommandExecutor {
 
         try {
             if (PasswordSecurity.comparePasswordWithHash(args[0], hash)) {
-                PlayerAuth auth = new PlayerAuth(name, hash, ip);
-                database.updateIP(auth);
+                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date());
+                database.updateLogin(auth);
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {

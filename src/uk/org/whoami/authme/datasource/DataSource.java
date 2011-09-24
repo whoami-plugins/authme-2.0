@@ -32,7 +32,7 @@ public interface DataSource {
 
     boolean saveAuth(PlayerAuth auth);
 
-    boolean updateIP(PlayerAuth auth);
+    boolean updateLogin(PlayerAuth auth);
 
     boolean updatePassword(PlayerAuth auth);
 
