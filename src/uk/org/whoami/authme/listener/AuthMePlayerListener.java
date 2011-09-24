@@ -16,6 +16,7 @@
 
 package uk.org.whoami.authme.listener;
 
+import java.util.Date;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -230,7 +231,11 @@ public class AuthMePlayerListener extends PlayerListener {
         if (data.isAuthAvailable(name)) {
             if (settings.isSessionsEnabled()) {
                 PlayerAuth auth = data.getAuth(name);
-                if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
+                long timeout = settings.getSessionTimeout()*60000;
+                long lastLogin = auth.getLastLogin().getTime();
+                long cur = new Date().getTime();
+
+                if (auth.getNickname().equals(name) && auth.getIp().equals(ip) && cur - lastLogin < timeout) {
                     PlayerCache.getInstance().addPlayer(auth);
                     player.sendMessage(m._("valid_session"));
                     return;

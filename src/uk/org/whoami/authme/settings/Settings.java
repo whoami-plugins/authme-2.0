@@ -49,6 +49,7 @@ public final class Settings extends Configuration {
         isTeleportToSpawnEnabled();
         getWarnMessageInterval();
         isSessionsEnabled();
+        getSessionTimeout();
         getRegistrationTimeout();
         isChatAllowed();
         getMaxNickLength();
@@ -98,11 +99,19 @@ public final class Settings extends Configuration {
     }
 
     public boolean isSessionsEnabled() {
-        String key = "settings.sessions";
+        String key = "settings.sessions.enabled";
         if (getString(key) == null) {
             setProperty(key, false);
         }
         return getBoolean(key, false);
+    }
+
+    public int getSessionTimeout() {
+        String key = "settings.sessions.timeout";
+        if (getString(key) == null) {
+            setProperty(key, 10);
+        }
+        return getInt(key, 10);
     }
 
     public boolean isKickOnWrongPasswordEnabled() {
