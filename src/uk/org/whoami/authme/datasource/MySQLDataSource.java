@@ -131,10 +131,10 @@ public class MySQLDataSource implements DataSource {
             pst.setString(1, user);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
-                if (rs.getString(3).isEmpty()) {
-                    return new PlayerAuth(rs.getString(2), rs.getString(3), "198.18.0.1");
+                if (rs.getString(columnIp).isEmpty()) {
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1");
                 } else {
-                    return new PlayerAuth(rs.getString(2), rs.getString(3), rs.getString(4));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp));
                 }
             } else {
                 return null;
@@ -248,10 +248,10 @@ public class MySQLDataSource implements DataSource {
             pst = con.prepareStatement("SELECT * FROM " + tableName + ";");
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                if (rs.getString(3).isEmpty()) {
-                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2), rs.getString(3), "198.18.0.1"));
+                if (rs.getString(columnIp).isEmpty()) {
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1"));
                 } else {
-                    map.put(rs.getString(2), new PlayerAuth(rs.getString(2), rs.getString(3), rs.getString(4)));
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp)));
                 }
             }
         } catch (SQLException ex) {
