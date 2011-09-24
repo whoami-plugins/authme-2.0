@@ -51,7 +51,7 @@ public class AuthMeBlockListener extends BlockListener {
             return;
         }
 
-        if (data.isAuthAvailable(name)) {
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
@@ -77,7 +77,7 @@ public class AuthMeBlockListener extends BlockListener {
             return;
         }
 
-        if (data.isAuthAvailable(name)) {
+        if (!data.isAuthAvailable(name)) {
             if (!settings.isForcedRegistrationEnabled()) {
                 return;
             }
