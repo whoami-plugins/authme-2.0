@@ -165,6 +165,7 @@ public class AuthMePlayerListener extends PlayerListener {
                 return;
             }
         }
+        event.setCancelled(true);
         event.setTo(event.getFrom());
     }
 
