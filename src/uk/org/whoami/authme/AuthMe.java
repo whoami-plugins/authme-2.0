@@ -123,6 +123,8 @@ public class AuthMe extends JavaPlugin {
                          Priority.Lowest, this);
         pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
                          Priority.Lowest, this);
+        pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener,
+                         Priority.Low, this);
         pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
                          Priority.Lowest, this);
         pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener,
