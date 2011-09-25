@@ -148,22 +148,13 @@ public class AuthMe extends JavaPlugin {
     }
 
     private void onReload(Player[] players) {
-        if (!settings.isForcedRegistrationEnabled()) {
-            return;
-        }
-
         for (Player player : players) {
             String name = player.getName().toLowerCase();
             String ip = player.getAddress().getAddress().getHostAddress();
 
-            if (settings.isKickNonRegisteredEnabled()) {
-                if (!database.isAuthAvailable(name)) {
-                    player.kickPlayer(m._("reg_only"));
-                    break;
-                }
-            }
+            boolean authAvail = database.isAuthAvailable(name);
 
-            if (database.isAuthAvailable(name)) {
+            if (authAvail) {
                 if (settings.isSessionsEnabled()) {
                     PlayerAuth auth = database.getAuth(name);
                     if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
@@ -172,6 +163,11 @@ public class AuthMe extends JavaPlugin {
                         break;
                     }
                 }
+            } else if (!settings.isForcedRegistrationEnabled()) {
+                break;
+            } else if (settings.isKickNonRegisteredEnabled()) {
+                player.kickPlayer(m._("reg_only"));
+                break;
             }
 
             LimboCache.getInstance().addLimboPlayer(player);
