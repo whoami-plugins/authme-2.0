@@ -5,6 +5,7 @@ nbproject/**
 dist/**
 nbproject/**
 build.xml
+jarlib/**
 \.orig$
 \.orig\..*$
 \.chg\..*$
