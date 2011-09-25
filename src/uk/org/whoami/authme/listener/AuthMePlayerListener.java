@@ -235,7 +235,7 @@ public class AuthMePlayerListener extends PlayerListener {
                 long lastLogin = auth.getLastLogin().getTime();
                 long cur = new Date().getTime();
 
-                if (auth.getNickname().equals(name) && auth.getIp().equals(ip) && cur - lastLogin < timeout) {
+                if (auth.getNickname().equals(name) && auth.getIp().equals(ip) && (cur - lastLogin < timeout || timeout == 0)) {
                     PlayerCache.getInstance().addPlayer(auth);
                     player.sendMessage(m._("valid_session"));
                     return;

@@ -178,7 +178,7 @@ public class AuthMe extends JavaPlugin {
                 player.teleport(player.getWorld().getSpawnLocation());
             }
 
-            String msg = database.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
+            String msg = authAvail ? m._("login_msg") : m._("reg_msg");
             int time = settings.getRegistrationTimeout() * 20;
             int msgInterval = settings.getWarnMessageInterval();
             BukkitScheduler sched = this.getServer().getScheduler();
