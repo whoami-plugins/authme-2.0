@@ -273,6 +273,11 @@ public class MySQLDataSource implements DataSource {
 
     @Override
     public synchronized void close() {
+        try {
+            conPool.dispose();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+        }
     }
 
     @Override
