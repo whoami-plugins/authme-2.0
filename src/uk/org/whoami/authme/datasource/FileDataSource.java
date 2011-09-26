@@ -91,7 +91,7 @@ public class FileDataSource implements DataSource {
         }
         return true;
     }
-    
+
     @Override
     public synchronized boolean updatePassword(PlayerAuth auth) {
         if (!isAuthAvailable(auth.getNickname())) {
@@ -227,7 +227,7 @@ public class FileDataSource implements DataSource {
                     case 3:
                         return new PlayerAuth(args[0], args[1], args[2], new Date(0));
                     case 4:
-                        return new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[4])));
+                        return new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[3])));
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -264,7 +264,7 @@ public class FileDataSource implements DataSource {
                         map.put(args[0], new PlayerAuth(args[0], args[1], args[2], new Date(0)));
                         break;
                     case 4:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[4]))));
+                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[3]))));
                         break;
                 }
             }
