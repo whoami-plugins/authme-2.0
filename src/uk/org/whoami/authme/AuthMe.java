@@ -107,8 +107,6 @@ public class AuthMe extends JavaPlugin {
                          Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
                          Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener,
-                         Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener,
                          Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,

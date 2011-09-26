@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -34,7 +33,6 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -364,34 +362,6 @@ public class AuthMePlayerListener extends PlayerListener {
             }
         }
 
-        event.setCancelled(true);
-    }
-
-    @Override
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (event.isCancelled() || event.getPlayer() == null) {
-            return;
-        }
-        Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
-
-        if(CitizensCommunicator.isNPC(player)) {
-            return;
-        }
-
-        if (settings.isTeleportToSpawnEnabled() && event.getTo().equals(player.getWorld().getSpawnLocation())) {
-            return;
-        }
-
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
-            return;
-        }
-
-        if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
-                return;
-            }
-        }
         event.setCancelled(true);
     }
 
