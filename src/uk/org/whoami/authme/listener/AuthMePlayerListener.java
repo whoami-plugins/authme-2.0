@@ -66,6 +66,7 @@ public class AuthMePlayerListener extends PlayerListener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
+
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
@@ -83,7 +84,13 @@ public class AuthMePlayerListener extends PlayerListener {
             }
         }
 
-        String cmd = event.getMessage().split(" ")[0];
+        String msg = event.getMessage();
+        //WorldEdit GUI Shit
+        if(msg.equalsIgnoreCase("/worldedit cui")) {
+            return;
+        }
+
+        String cmd = msg.split(" ")[0];
         if (cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register")) {
             return;
         }
@@ -370,6 +377,7 @@ public class AuthMePlayerListener extends PlayerListener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
+
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
