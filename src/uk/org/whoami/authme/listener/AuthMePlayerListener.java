@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.listener;
 
 import java.util.Date;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -49,16 +50,14 @@ import uk.org.whoami.authme.task.TimeoutTask;
 
 public class AuthMePlayerListener extends PlayerListener {
 
-    private Settings settings;
-    private Messages m;
+    private Settings settings = Settings.getInstance();
+    private Messages m = Messages.getInstance();
     private JavaPlugin plugin;
     private DataSource data;
 
     public AuthMePlayerListener(JavaPlugin plugin, DataSource data) {
-        this.settings = Settings.getInstance();
-        this.m = Messages.getInstance();
-        this.data = data;
         this.plugin = plugin;
+        this.data = data;
     }
 
     @Override
@@ -70,7 +69,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -86,7 +85,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         String msg = event.getMessage();
         //WorldEdit GUI Shit
-        if(msg.equalsIgnoreCase("/worldedit cui")) {
+        if (msg.equalsIgnoreCase("/worldedit cui")) {
             return;
         }
 
@@ -108,7 +107,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -139,7 +138,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -184,7 +183,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -227,7 +226,7 @@ public class AuthMePlayerListener extends PlayerListener {
         String name = player.getName().toLowerCase();
         String ip = player.getAddress().getAddress().getHostAddress();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -238,7 +237,7 @@ public class AuthMePlayerListener extends PlayerListener {
         if (data.isAuthAvailable(name)) {
             if (settings.isSessionsEnabled()) {
                 PlayerAuth auth = data.getAuth(name);
-                long timeout = settings.getSessionTimeout()*60000;
+                long timeout = settings.getSessionTimeout() * 60000;
                 long lastLogin = auth.getLastLogin().getTime();
                 long cur = new Date().getTime();
 
@@ -257,6 +256,7 @@ public class AuthMePlayerListener extends PlayerListener {
         LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
+        player.setGameMode(GameMode.SURVIVAL);
         if (settings.isTeleportToSpawnEnabled()) {
             player.teleport(player.getWorld().getSpawnLocation());
         }
@@ -280,7 +280,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -304,7 +304,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -329,7 +329,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -355,7 +355,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -381,7 +381,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -405,7 +405,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
@@ -429,7 +429,7 @@ public class AuthMePlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
-        if(CitizensCommunicator.isNPC(player)) {
+        if (CitizensCommunicator.isNPC(player)) {
             return;
         }
 
