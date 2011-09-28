@@ -146,32 +146,33 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
-        if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
-                return;
-            }
-
-            if (settings.isMovementAllowed()) {
-                if (settings.getMovementRadius() > 0) {
-                    int radius = settings.getMovementRadius();
-                    Location spawn = player.getWorld().getSpawnLocation();
-                    Location to = event.getTo();
-                    if (to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius) {
-                        event.setCancelled(true);
-                    }
-                    if (to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius) {
-                        event.setCancelled(true);
-                    }
-                    if (to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
-                        event.setCancelled(true);
-                    }
-                    event.setTo(to);
-                }
-                return;
-            }
+        if (data.isAuthAvailable(name)) {
+            event.setTo(event.getFrom());
+            return;
         }
-        event.setCancelled(true);
-        event.setTo(event.getFrom());
+
+        if (!settings.isForcedRegistrationEnabled()) {
+            return;
+        }
+
+        if (!settings.isMovementAllowed()) {
+            event.setTo(event.getFrom());
+            return;
+        }
+
+        if (settings.getMovementRadius() == 0) {
+            return;
+        }
+        
+        int radius = settings.getMovementRadius();
+        Location spawn = player.getWorld().getSpawnLocation();
+        Location to = event.getTo();
+
+        if (to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius ||
+            to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius ||
+            to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
+            event.setTo(event.getFrom());
+        }
     }
 
     @Override
