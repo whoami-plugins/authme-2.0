@@ -131,7 +131,7 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean updateLogin(PlayerAuth auth) {
+    public boolean updateSession(PlayerAuth auth) {
         if (!isAuthAvailable(auth.getNickname())) {
             return false;
         }

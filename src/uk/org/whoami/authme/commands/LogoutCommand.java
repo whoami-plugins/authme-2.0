@@ -16,6 +16,7 @@
 
 package uk.org.whoami.authme.commands;
 
+import java.util.Date;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,8 +25,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import uk.org.whoami.authme.ConsoleLogger;
+import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.cache.inventory.LimboCache;
+import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
@@ -36,9 +39,11 @@ public class LogoutCommand implements CommandExecutor {
     private Messages m = Messages.getInstance();
     private Settings settings = Settings.getInstance();
     private JavaPlugin plugin;
+    private DataSource database;
 
-    public LogoutCommand(JavaPlugin plugin) {
+    public LogoutCommand(JavaPlugin plugin, DataSource database) {
         this.plugin = plugin;
+        this.database = database;
     }
 
     @Override
@@ -60,7 +65,13 @@ public class LogoutCommand implements CommandExecutor {
             return true;
         }
 
-        PlayerCache.getInstance().removePlayer(player.getName().toLowerCase());
+        //clear session
+        PlayerAuth auth = PlayerCache.getInstance().getAuth(name);
+        auth.setIp("198.18.0.1");
+        auth.setLastLogin(new Date(0));
+        database.updateSession(auth);
+
+        PlayerCache.getInstance().removePlayer(name);
 
         LimboCache.getInstance().addLimboPlayer(player);
         player.getInventory().setArmorContents(new ItemStack[0]);

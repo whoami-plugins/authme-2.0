@@ -58,8 +58,8 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean updateLogin(PlayerAuth auth) {
-        if (source.updateLogin(auth)) {
+    public boolean updateSession(PlayerAuth auth) {
+        if (source.updateSession(auth)) {
             cache.get(auth.getNickname()).setHash(auth.getHash());
             cache.get(auth.getNickname()).setLastLogin(auth.getLastLogin());
             return true;

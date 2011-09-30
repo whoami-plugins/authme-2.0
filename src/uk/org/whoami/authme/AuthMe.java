@@ -132,7 +132,7 @@ public class AuthMe extends JavaPlugin {
         this.getCommand("register").setExecutor(new RegisterCommand(database));
         this.getCommand("login").setExecutor(new LoginCommand(database));
         this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(database));
-        this.getCommand("logout").setExecutor(new LogoutCommand(this));
+        this.getCommand("logout").setExecutor(new LogoutCommand(this,database));
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
 
         onReload(this.getServer().getOnlinePlayers());

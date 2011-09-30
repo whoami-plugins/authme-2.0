@@ -204,7 +204,7 @@ public class MySQLDataSource implements DataSource {
     }
 
     @Override
-    public boolean updateLogin(PlayerAuth auth) {
+    public boolean updateSession(PlayerAuth auth) {
         Connection con = null;
         PreparedStatement pst = null;
         try {
