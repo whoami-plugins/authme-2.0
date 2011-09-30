@@ -39,6 +39,7 @@ import uk.org.whoami.authme.commands.UnregisterCommand;
 import uk.org.whoami.authme.datasource.CacheDataSource;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.FileDataSource;
+import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;
 import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
@@ -77,6 +78,10 @@ public class AuthMe extends JavaPlugin {
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch (SQLException ex) {
+                    ConsoleLogger.showError(ex.getMessage());
+                    this.getServer().getPluginManager().disablePlugin(this);
+                    return;
+                } catch(TimeoutException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;

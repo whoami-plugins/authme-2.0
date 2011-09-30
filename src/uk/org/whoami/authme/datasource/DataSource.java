@@ -43,6 +43,4 @@ public interface DataSource {
     void close();
 
     void reload();
-
-    HashMap<String, PlayerAuth> getAllRegisteredUsers();
 }

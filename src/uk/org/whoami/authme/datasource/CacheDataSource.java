@@ -26,17 +26,22 @@ public class CacheDataSource implements DataSource {
 
     public CacheDataSource(DataSource source) {
         this.source = source;
-        cache = source.getAllRegisteredUsers();
     }
 
     @Override
     public synchronized boolean isAuthAvailable(String user) {
-        return cache.containsKey(user);
+        return cache.containsKey(user) ? true : source.isAuthAvailable(user);
     }
 
     @Override
     public synchronized PlayerAuth getAuth(String user) {
-        return cache.get(user);
+        if(cache.containsKey(user)) {
+            return cache.get(user);
+        } else {
+            PlayerAuth auth = source.getAuth(user);
+            cache.put(user, auth);
+            return auth;
+        }
     }
 
     @Override
@@ -90,17 +95,11 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public synchronized HashMap<String, PlayerAuth> getAllRegisteredUsers() {
-        return cache;
-    }
-
-    @Override
     public synchronized void close() {
         source.close();
     }
 
     @Override
     public void reload() {
-        cache = source.getAllRegisteredUsers();
     }
 }

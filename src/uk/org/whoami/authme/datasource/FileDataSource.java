@@ -303,44 +303,6 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public synchronized HashMap<String, PlayerAuth> getAllRegisteredUsers() {
-        HashMap<String, PlayerAuth> map = new HashMap<String, PlayerAuth>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(source));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] args = line.split(":");
-                switch (args.length) {
-                    case 2:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], "198.18.0.1", 0));
-                        break;
-                    case 3:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], 0));
-                        break;
-                    case 4:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3])));
-                        break;
-                }
-            }
-        } catch (FileNotFoundException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-            return map;
-        } catch (IOException ex) {
-            ConsoleLogger.showError(ex.getMessage());
-            return map;
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ex) {
-                }
-            }
-        }
-        return map;
-    }
-
-    @Override
     public synchronized void close() {
     }
 
