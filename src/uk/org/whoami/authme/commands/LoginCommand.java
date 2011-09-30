@@ -82,9 +82,9 @@ public class LoginCommand implements CommandExecutor {
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
+                    player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                     player.getInventory().setContents(limbo.getInventory());
                     player.getInventory().setArmorContents(limbo.getArmour());
-                    player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                     if (settings.isTeleportToSpawnEnabled()) {
                         player.teleport(limbo.getLoc());
                     }
