@@ -57,6 +57,7 @@ public class Messages extends Configuration {
         map.put("reg_voluntarily", "You can register your nickname with the server with the command \"/register password\"");
         map.put("reload", "Configuration and database has been reloaded");
         map.put("error", "An error ocurred; Please contact the admin");
+        map.put("unknown_user", "User is not in database");
     }
 
     private void loadFile() {

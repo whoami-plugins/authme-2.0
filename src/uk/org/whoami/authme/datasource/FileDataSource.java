@@ -107,7 +107,7 @@ public class FileDataSource implements DataSource {
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
                 if (args[0].equals(auth.getNickname())) {
-                    newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], new Date(Long.parseLong(args[4])));
+                    newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], new Date(Long.parseLong(args[3])));
                     break;
                 }
             }

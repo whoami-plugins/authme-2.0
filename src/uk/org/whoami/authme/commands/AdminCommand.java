@@ -92,8 +92,17 @@ public class AdminCommand implements CommandExecutor {
                 String name = args[1].toLowerCase();
                 String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[2]);
 
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", new Date(0));
-
+                PlayerAuth auth = null;
+                if(PlayerCache.getInstance().isAuthenticated(name)) {
+                    auth = PlayerCache.getInstance().getAuth(name);
+                } else if(database.isAuthAvailable(name)) {
+                    auth = database.getAuth(name);
+                } else {
+                    sender.sendMessage(m._("unknown_user"));
+                    return true;
+                }
+                auth.setHash(hash);
+                
                 if (!database.updatePassword(auth)) {
                     sender.sendMessage(m._("error"));
                     return true;
