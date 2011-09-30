@@ -16,7 +16,6 @@
 
 package uk.org.whoami.authme.datasource;
 
-import java.util.HashMap;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
 public interface DataSource {
