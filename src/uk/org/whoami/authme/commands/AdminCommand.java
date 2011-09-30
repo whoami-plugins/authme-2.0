@@ -42,7 +42,7 @@ public class AdminCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmnd, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("Usage: /authme reload|register playername password|changepassword playername password|unregister playername");
+            sender.sendMessage("Usage: /authme reload|register playername password|changepassword playername password|unregister playername|purge");
             return true;
         }
 
