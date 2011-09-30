@@ -24,7 +24,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -32,6 +31,15 @@ import uk.org.whoami.authme.settings.Settings;
 
 public class FileDataSource implements DataSource {
 
+    /* file layout:
+     *
+     * PLAYERNAME:HASHSUM:IP:LOGININMILLIESECONDS
+     *
+     * Old but compatible:
+     * PLAYERNAME:HASHSUM:IP
+     * PLAYERNAME:HASHSUM
+     *
+     */
     private File source;
 
     public FileDataSource() throws IOException {
@@ -77,7 +85,7 @@ public class FileDataSource implements DataSource {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(source, true));
-            bw.write(auth.getNickname() + ":" + auth.getHash() + ":" + auth.getIp() + ":" + auth.getLastLogin().getTime() + "\n");
+            bw.write(auth.getNickname() + ":" + auth.getHash() + ":" + auth.getIp() + ":" + auth.getLastLogin() + "\n");
         } catch (IOException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;
@@ -107,7 +115,7 @@ public class FileDataSource implements DataSource {
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
                 if (args[0].equals(auth.getNickname())) {
-                    newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], new Date(Long.parseLong(args[3])));
+                    newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]));
                     break;
                 }
             }
@@ -169,6 +177,52 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
+    public boolean purgeDatabase(long until) {
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        ArrayList<String> lines = new ArrayList<String>();
+
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length == 4) {
+                    if (Long.parseLong(args[3]) >= until) {
+                        lines.add(line);
+                    }
+                }
+            }
+
+            bw = new BufferedWriter(new FileWriter(source));
+            for (String l : lines) {
+                bw.write(l + "\n");
+            }
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public synchronized boolean removeAuth(String user) {
         if (!isAuthAvailable(user)) {
             return false;
@@ -186,6 +240,7 @@ public class FileDataSource implements DataSource {
                     lines.add(line);
                 }
             }
+
             bw = new BufferedWriter(new FileWriter(source));
             for (String l : lines) {
                 bw.write(l + "\n");
@@ -223,11 +278,11 @@ public class FileDataSource implements DataSource {
                 String[] args = line.split(":");
                 switch (args.length) {
                     case 2:
-                        return new PlayerAuth(args[0], args[1], "198.18.0.1", new Date(0));
+                        return new PlayerAuth(args[0], args[1], "198.18.0.1", 0);
                     case 3:
-                        return new PlayerAuth(args[0], args[1], args[2], new Date(0));
+                        return new PlayerAuth(args[0], args[1], args[2], 0);
                     case 4:
-                        return new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[3])));
+                        return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]));
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -256,15 +311,15 @@ public class FileDataSource implements DataSource {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
-                switch(args.length) {
+                switch (args.length) {
                     case 2:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], "198.18.0.1", new Date(0)));
+                        map.put(args[0], new PlayerAuth(args[0], args[1], "198.18.0.1", 0));
                         break;
                     case 3:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], new Date(0)));
+                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], 0));
                         break;
                     case 4:
-                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], new Date(Long.parseLong(args[3]))));
+                        map.put(args[0], new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3])));
                         break;
                 }
             }

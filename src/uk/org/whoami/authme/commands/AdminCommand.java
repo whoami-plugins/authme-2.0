@@ -51,7 +51,25 @@ public class AdminCommand implements CommandExecutor {
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("reload")) {
+        if (args[0].equalsIgnoreCase("purge")) {
+            if (args.length != 2) {
+                sender.sendMessage("Usage: /authme purge <DAYS>");
+                return true;
+            }
+
+            try {
+                long days = Long.parseLong(args[1]) * 86400000;
+                long until = new Date().getTime() - days;
+
+                if (!database.purgeDatabase(until)) {
+                    sender.sendMessage(m._("error"));
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                sender.sendMessage("Usage: /authme purge <DAYS>");
+                return true;
+            }
+        } else if (args[0].equalsIgnoreCase("reload")) {
             database.reload();
             settings.reload();
             m.reload();
@@ -71,7 +89,7 @@ public class AdminCommand implements CommandExecutor {
                     return true;
                 }
 
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", new Date(0));
+                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", 0);
                 if (!database.saveAuth(auth)) {
                     sender.sendMessage(m._("error"));
                     return true;
@@ -93,16 +111,16 @@ public class AdminCommand implements CommandExecutor {
                 String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[2]);
 
                 PlayerAuth auth = null;
-                if(PlayerCache.getInstance().isAuthenticated(name)) {
+                if (PlayerCache.getInstance().isAuthenticated(name)) {
                     auth = PlayerCache.getInstance().getAuth(name);
-                } else if(database.isAuthAvailable(name)) {
+                } else if (database.isAuthAvailable(name)) {
                     auth = database.getAuth(name);
                 } else {
                     sender.sendMessage(m._("unknown_user"));
                     return true;
                 }
                 auth.setHash(hash);
-                
+
                 if (!database.updatePassword(auth)) {
                     sender.sendMessage(m._("error"));
                     return true;

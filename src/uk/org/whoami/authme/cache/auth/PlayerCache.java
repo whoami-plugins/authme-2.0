@@ -16,7 +16,6 @@
 
 package uk.org.whoami.authme.cache.auth;
 
-import java.util.Date;
 import java.util.HashMap;
 
 public class PlayerCache {
@@ -28,7 +27,7 @@ public class PlayerCache {
         cache = new HashMap<String, PlayerAuth>();
     }
 
-    public void addPlayer(String user, String hash, String ip, Date lastLogin) {
+    public void addPlayer(String user, String hash, String ip, long lastLogin) {
         PlayerAuth tmp = new PlayerAuth(user, hash, ip, lastLogin);
         cache.put(user, tmp);
     }

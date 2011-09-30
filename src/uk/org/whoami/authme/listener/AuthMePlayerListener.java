@@ -163,7 +163,7 @@ public class AuthMePlayerListener extends PlayerListener {
         if (settings.getMovementRadius() == 0) {
             return;
         }
-        
+
         int radius = settings.getMovementRadius();
         Location spawn = player.getWorld().getSpawnLocation();
         Location to = event.getTo();
@@ -239,7 +239,7 @@ public class AuthMePlayerListener extends PlayerListener {
             if (settings.isSessionsEnabled()) {
                 PlayerAuth auth = data.getAuth(name);
                 long timeout = settings.getSessionTimeout() * 60000;
-                long lastLogin = auth.getLastLogin().getTime();
+                long lastLogin = auth.getLastLogin();
                 long cur = new Date().getTime();
 
                 if (auth.getNickname().equals(name) && auth.getIp().equals(ip) && (cur - lastLogin < timeout || timeout == 0)) {

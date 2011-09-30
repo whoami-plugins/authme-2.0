@@ -68,6 +68,19 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
+    public boolean purgeDatabase(long until) {
+        if (source.purgeDatabase(until)) {
+            for (PlayerAuth auth : cache.values()) {
+                if(auth.getLastLogin() < until) {
+                    cache.remove(auth.getNickname());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public synchronized boolean removeAuth(String user) {
         if (source.removeAuth(user)) {
             cache.remove(user);

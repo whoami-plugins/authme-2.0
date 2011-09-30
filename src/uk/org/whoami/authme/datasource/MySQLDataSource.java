@@ -22,10 +22,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.HashMap;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
+import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;
 import uk.org.whoami.authme.settings.Settings;
 
 public class MySQLDataSource implements DataSource {
@@ -144,9 +144,9 @@ public class MySQLDataSource implements DataSource {
             rs = pst.executeQuery();
             if (rs.next()) {
                 if (rs.getString(columnIp).isEmpty()) {
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", new Date(rs.getLong(columnLastLogin)));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin));
                 } else {
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), new Date(rs.getLong(columnLastLogin)));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin));
                 }
             } else {
                 return null;
@@ -171,7 +171,7 @@ public class MySQLDataSource implements DataSource {
             pst.setString(1, auth.getNickname());
             pst.setString(2, auth.getHash());
             pst.setString(3, auth.getIp());
-            pst.setLong(4, auth.getLastLogin().getTime());
+            pst.setLong(4, auth.getLastLogin());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
@@ -211,10 +211,32 @@ public class MySQLDataSource implements DataSource {
             con = conPool.getConnection();
             pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnIp + "=?, " + columnLastLogin + "=? WHERE " + columnName + "=?;");
             pst.setString(1, auth.getIp());
-            pst.setLong(2, auth.getLastLogin().getTime());
+            pst.setLong(2, auth.getLastLogin());
             pst.setString(3, auth.getNickname());
             pst.executeUpdate();
         } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            close(pst);
+            close(con);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean purgeDatabase(long until) {
+        Connection con = null;
+        PreparedStatement pst = null;
+        try {
+            con = conPool.getValidConnection();
+            pst = con.prepareStatement("DELETE FROM " + tableName + " WHERE " + columnLastLogin + "<?;");
+            pst.setLong(1, until);
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (TimeoutException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;
         } finally {
@@ -255,9 +277,9 @@ public class MySQLDataSource implements DataSource {
             rs = pst.executeQuery();
             while (rs.next()) {
                 if (rs.getString(columnIp).isEmpty()) {
-                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", new Date(rs.getLong(columnLastLogin))));
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin)));
                 } else {
-                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), new Date(rs.getLong(columnLastLogin))));
+                    map.put(rs.getString(columnName), new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin)));
                 }
             }
         } catch (SQLException ex) {

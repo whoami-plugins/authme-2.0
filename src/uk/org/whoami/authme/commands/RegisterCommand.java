@@ -81,7 +81,7 @@ public class RegisterCommand implements CommandExecutor {
         try {
             String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[0]);
 
-            PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date());
+            PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
             if (!database.saveAuth(auth)) {
                 player.sendMessage(m._("error"));
                 return true;

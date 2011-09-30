@@ -68,7 +68,6 @@ public class LogoutCommand implements CommandExecutor {
         //clear session
         PlayerAuth auth = PlayerCache.getInstance().getAuth(name);
         auth.setIp("198.18.0.1");
-        auth.setLastLogin(new Date(0));
         database.updateSession(auth);
 
         PlayerCache.getInstance().removePlayer(name);

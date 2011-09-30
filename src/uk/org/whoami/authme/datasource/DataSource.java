@@ -36,6 +36,8 @@ public interface DataSource {
 
     boolean updatePassword(PlayerAuth auth);
 
+    boolean purgeDatabase(long until);
+
     boolean removeAuth(String user);
 
     void close();

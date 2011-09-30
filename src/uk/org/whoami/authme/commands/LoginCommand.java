@@ -77,7 +77,7 @@ public class LoginCommand implements CommandExecutor {
 
         try {
             if (PasswordSecurity.comparePasswordWithHash(args[0], hash)) {
-                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date());
+                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
                 database.updateSession(auth);
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);

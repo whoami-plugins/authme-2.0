@@ -23,9 +23,9 @@ public class PlayerAuth {
     private String nickname;
     private String hash;
     private String ip;
-    private Date lastLogin;
+    private long lastLogin;
 
-    public PlayerAuth(String nickname, String hash, String ip, Date lastLogin) {
+    public PlayerAuth(String nickname, String hash, String ip, long lastLogin) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
@@ -44,7 +44,7 @@ public class PlayerAuth {
         return hash;
     }
 
-    public Date getLastLogin() {
+    public long getLastLogin() {
         return lastLogin;
     }
 
@@ -56,7 +56,7 @@ public class PlayerAuth {
         this.ip = ip;
     }
 
-    public void setLastLogin(Date lastLogin) {
+    public void setLastLogin(long lastLogin) {
         this.lastLogin = lastLogin;
     }
 
