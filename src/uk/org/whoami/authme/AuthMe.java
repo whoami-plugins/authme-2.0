@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
-import uk.org.whoami.authme.cache.inventory.LimboCache;
+import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.commands.AdminCommand;
 import uk.org.whoami.authme.commands.ChangePasswordCommand;
 import uk.org.whoami.authme.commands.LoginCommand;

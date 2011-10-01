@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.org.whoami.authme.cache.inventory;
+package uk.org.whoami.authme.cache.limbo;
 
 import java.util.HashMap;
 import org.bukkit.Location;
