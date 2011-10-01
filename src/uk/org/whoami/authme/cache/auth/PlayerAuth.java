@@ -64,11 +64,8 @@ public class PlayerAuth {
             return false;
         }
         PlayerAuth other = (PlayerAuth) obj;
-        if (other.getIp().equals(this.ip) && other.getNickname().equals(this.nickname)) {
-            return true;
-        } else {
-            return false;
-        }
+        
+        return other.getIp().equals(this.ip) && other.getNickname().equals(this.nickname);
     }
 
     @Override

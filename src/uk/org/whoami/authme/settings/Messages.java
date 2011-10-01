@@ -18,6 +18,7 @@ package uk.org.whoami.authme.settings;
 
 import java.io.File;
 import java.util.HashMap;
+
 import org.bukkit.util.config.Configuration;
 
 public class Messages extends Configuration {

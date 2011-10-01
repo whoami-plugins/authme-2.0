@@ -17,11 +17,13 @@
 package uk.org.whoami.authme.datasource;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;

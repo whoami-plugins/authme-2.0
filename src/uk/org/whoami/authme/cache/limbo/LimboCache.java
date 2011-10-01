@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.cache.limbo;
 
 import java.util.HashMap;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

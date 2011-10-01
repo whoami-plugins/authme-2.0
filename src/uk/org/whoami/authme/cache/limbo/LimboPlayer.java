@@ -63,8 +63,4 @@ public class LimboPlayer {
     public int getGameMode() {
         return gameMode;
     }
-
-    public void setGameMode(int gamemode) {
-        this.gameMode = gamemode;
-    }
 }

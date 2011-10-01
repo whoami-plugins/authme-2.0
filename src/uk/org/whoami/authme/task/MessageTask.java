@@ -19,6 +19,7 @@ package uk.org.whoami.authme.task;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 
 public class MessageTask implements Runnable {

@@ -17,7 +17,9 @@
 package uk.org.whoami.authme.settings;
 
 import java.io.File;
+
 import org.bukkit.util.config.Configuration;
+
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.DataSource.DataSourceType;

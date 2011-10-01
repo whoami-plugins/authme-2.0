@@ -27,11 +27,6 @@ public class PlayerCache {
         cache = new HashMap<String, PlayerAuth>();
     }
 
-    public void addPlayer(String user, String hash, String ip, long lastLogin) {
-        PlayerAuth tmp = new PlayerAuth(user, hash, ip, lastLogin);
-        cache.put(user, tmp);
-    }
-
     public void addPlayer(PlayerAuth auth) {
         cache.put(auth.getNickname(), auth);
     }
