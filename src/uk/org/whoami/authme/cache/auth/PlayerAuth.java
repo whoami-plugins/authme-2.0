@@ -16,8 +16,6 @@
 
 package uk.org.whoami.authme.cache.auth;
 
-import java.util.Date;
-
 public class PlayerAuth {
 
     private String nickname;
