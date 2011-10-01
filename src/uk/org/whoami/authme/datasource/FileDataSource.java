@@ -176,10 +176,11 @@ public class FileDataSource implements DataSource {
     }
 
     @Override
-    public boolean purgeDatabase(long until) {
+    public int purgeDatabase(long until) {
         BufferedReader br = null;
         BufferedWriter bw = null;
         ArrayList<String> lines = new ArrayList<String>();
+        int cleared = 0;
 
         try {
             br = new BufferedReader(new FileReader(source));
@@ -189,8 +190,10 @@ public class FileDataSource implements DataSource {
                 if (args.length == 4) {
                     if (Long.parseLong(args[3]) >= until) {
                         lines.add(line);
+                        continue;
                     }
                 }
+                cleared++;
             }
 
             bw = new BufferedWriter(new FileWriter(source));
@@ -199,10 +202,10 @@ public class FileDataSource implements DataSource {
             }
         } catch (FileNotFoundException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return false;
+            return cleared;
         } catch (IOException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return false;
+            return cleared;
         } finally {
             if (br != null) {
                 try {
@@ -217,8 +220,7 @@ public class FileDataSource implements DataSource {
                 }
             }
         }
-
-        return true;
+        return cleared;
     }
 
     @Override

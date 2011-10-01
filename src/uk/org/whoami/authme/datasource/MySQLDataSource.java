@@ -238,25 +238,24 @@ public class MySQLDataSource implements DataSource {
     }
 
     @Override
-    public boolean purgeDatabase(long until) {
+    public int purgeDatabase(long until) {
         Connection con = null;
         PreparedStatement pst = null;
         try {
             con = conPool.getValidConnection();
             pst = con.prepareStatement("DELETE FROM " + tableName + " WHERE " + columnLastLogin + "<?;");
             pst.setLong(1, until);
-            pst.executeUpdate();
+            return pst.executeUpdate();
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return false;
+            return 0;
         } catch (TimeoutException ex) {
             ConsoleLogger.showError(ex.getMessage());
-            return false;
+            return 0;
         } finally {
             close(pst);
             close(con);
         }
-        return true;
     }
 
     @Override

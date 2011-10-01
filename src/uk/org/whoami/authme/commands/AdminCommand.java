@@ -61,10 +61,8 @@ public class AdminCommand implements CommandExecutor {
                 long days = Long.parseLong(args[1]) * 86400000;
                 long until = new Date().getTime() - days;
 
-                if (!database.purgeDatabase(until)) {
-                    sender.sendMessage(m._("error"));
-                    return true;
-                }
+                sender.sendMessage("Deleted " + database.purgeDatabase(until) + " user accounts");
+
             } catch (NumberFormatException e) {
                 sender.sendMessage("Usage: /authme purge <DAYS>");
                 return true;

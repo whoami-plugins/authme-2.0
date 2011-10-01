@@ -22,7 +22,7 @@ import uk.org.whoami.authme.cache.auth.PlayerAuth;
 public class CacheDataSource implements DataSource {
 
     private DataSource source;
-    private HashMap<String, PlayerAuth> cache;
+    private final HashMap<String, PlayerAuth> cache = new HashMap<String, PlayerAuth>();
 
     public CacheDataSource(DataSource source) {
         this.source = source;
@@ -73,16 +73,17 @@ public class CacheDataSource implements DataSource {
     }
 
     @Override
-    public boolean purgeDatabase(long until) {
-        if (source.purgeDatabase(until)) {
+    public int purgeDatabase(long until) {
+        int cleared = source.purgeDatabase(until);
+
+        if (cleared > 0) {
             for (PlayerAuth auth : cache.values()) {
                 if(auth.getLastLogin() < until) {
                     cache.remove(auth.getNickname());
                 }
             }
-            return true;
         }
-        return false;
+        return cleared;
     }
 
     @Override
