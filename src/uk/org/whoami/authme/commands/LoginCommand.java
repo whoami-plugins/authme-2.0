@@ -75,6 +75,13 @@ public class LoginCommand implements CommandExecutor {
             return true;
         }
 
+        PlayerAuth autht = database.getAuth(name);
+
+        System.out.println(autht.getNickname());
+        System.out.println(autht.getHash());
+        System.out.println(autht.getIp());
+        System.out.println(autht.getLastLogin());
+
         String hash = database.getAuth(name).getHash();
 
         try {

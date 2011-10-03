@@ -103,5 +103,6 @@ public class CacheDataSource implements DataSource {
 
     @Override
     public void reload() {
+        cache.clear();
     }
 }

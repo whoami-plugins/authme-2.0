@@ -28,6 +28,9 @@ public class CitizensCommunicator {
         PluginManager pm = player.getServer().getPluginManager();
         Plugin plugin = pm.getPlugin("Citizens");
 
-        return plugin != null || CitizensManager.isNPC(player);
+        if(plugin != null) {
+            return CitizensManager.isNPC(player);
+        }
+        return false;
     }
 }

@@ -278,13 +278,15 @@ public class FileDataSource implements DataSource {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
-                switch (args.length) {
-                    case 2:
-                        return new PlayerAuth(args[0], args[1], "198.18.0.1", 0);
-                    case 3:
-                        return new PlayerAuth(args[0], args[1], args[2], 0);
-                    case 4:
-                        return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]));
+                if (args[0].equals(user)) {
+                    switch (args.length) {
+                        case 2:
+                            return new PlayerAuth(args[0], args[1], "198.18.0.1", 0);
+                        case 3:
+                            return new PlayerAuth(args[0], args[1], args[2], 0);
+                        case 4:
+                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]));
+                    }
                 }
             }
         } catch (FileNotFoundException ex) {
